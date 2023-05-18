@@ -15,8 +15,5 @@ public class Wallet {
 
     private double coins;
 
-    @DocumentReference
-    private List<User> owners;
-
     private String idWallet;
 }

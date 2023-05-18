@@ -41,5 +41,5 @@ public class UserAPI {
         if(res.isPresent()) return new ResponseEntity<Optional<User>>(res, HttpStatus.CREATED);
         return new ResponseEntity<Optional<User>>(res, HttpStatus.BAD_REQUEST);
     }
-    
+
 }

@@ -19,10 +19,18 @@ public class Debt {
     private String idDebt;
 
     @DocumentReference
-    private User idCreditor;
+    private User creditor;
 
     @DocumentReference
-    private User idDebtor;
+    private User debtor;
 
     private double debt;
+
+    @DocumentReference
+    private Expence idExpence;
+
+    public Debt(String idDebt , double debt) {
+        this.idDebt = idDebt;
+        this.debt = debt;
+    }
 }

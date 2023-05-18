@@ -32,4 +32,5 @@ public class UserService {
         User user =  ur.insert(new User(username, password));
         return Optional.of(user);
     }
+
 }
