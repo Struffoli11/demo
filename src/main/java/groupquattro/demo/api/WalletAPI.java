@@ -1,9 +1,7 @@
 package groupquattro.demo.api;
 
-import groupquattro.demo.classes.Wallet;
+import groupquattro.demo.model.Wallet;
 import groupquattro.demo.services.WalletService;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

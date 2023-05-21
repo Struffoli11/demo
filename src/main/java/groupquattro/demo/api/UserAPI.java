@@ -1,10 +1,7 @@
 package groupquattro.demo.api;
 
-import groupquattro.demo.classes.User;
+import groupquattro.demo.model.User;
 import groupquattro.demo.services.UserService;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +14,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/users")
 public class UserAPI {
+    UserAPI(){}
     @Autowired
     UserService us;
 

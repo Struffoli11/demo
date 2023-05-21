@@ -1,4 +1,4 @@
-package groupquattro.demo.classes;
+package groupquattro.demo.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,9 +22,14 @@ public class Group {
 
     private String idGroup;
 
+    private List<String> members;
+
     @DocumentReference
-    private List<Expence> expences;
+    private List<RomanaExpence> expences;
 
-
-
+    public Group(String groupName, String idGroup, List<String> members) {
+        this.groupName = groupName;
+        this.idGroup = idGroup;
+        this.members = members;
+    }
 }

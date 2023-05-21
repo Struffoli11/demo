@@ -1,4 +1,4 @@
-package groupquattro.demo.classes;
+package groupquattro.demo.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,9 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
+import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Document(collection = "users")
@@ -20,19 +22,21 @@ public class User {
 
     private String username;
 
+    //private String email;
+
     private String password;
 
-    @DocumentReference
+    @Field(value = "groups", write = Field.Write.NON_NULL) @DocumentReference(lazy = true)
     private List<Group> groups;
 
-    @DocumentReference
-    private List<Debt> debts;
-
-    @DocumentReference
-    private List<Wallet> walletId;
+    @Field(value = "wallet", write = Field.Write.NON_NULL)@DocumentReference(lazy = true)
+    private Wallet wallet;
 
     public User(String username, String password) {
         this.username = username;
         this.password = password;
+        this.groups = new ArrayList<Group>();
+        this.wallet = null;
+
     }
 }

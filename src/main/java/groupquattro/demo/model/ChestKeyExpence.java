@@ -1,31 +1,37 @@
-package groupquattro.demo.classes;
+package groupquattro.demo.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
+import java.util.Map;
 
 @Document(collection = "expences")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Expence {
+@Builder
+public class ChestKeyExpence extends Expence{
 
     @Id
     private ObjectId id;
 
-    private double cost;
+    private  double cost;
 
-    private String idExpence;
+    private Date date;
 
     private String description;
 
-    public Expence(double cost, String idExpence, String description) {
-        this.cost = cost;
-        this.idExpence = idExpence;
-        this.description = description;
+    private Map<String, Double> payingMembers;
+
+    private ExpenceKey ek;
+
+    public static class ChestKeyExpenceBuilder{
+
     }
 }

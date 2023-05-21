@@ -1,6 +1,6 @@
 package groupquattro.demo.repos;
 
-import groupquattro.demo.classes.Wallet;
+import groupquattro.demo.model.Wallet;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;

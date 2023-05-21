@@ -1,6 +1,6 @@
 package groupquattro.demo.services;
 
-import groupquattro.demo.classes.Wallet;
+import groupquattro.demo.model.Wallet;
 import groupquattro.demo.repos.WalletRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
