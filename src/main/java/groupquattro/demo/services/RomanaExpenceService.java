@@ -29,6 +29,10 @@ public class RomanaExpenceService {
         return er.findRomanaExpenceById(idExpence);
     }
 
+    public List<RomanaExpence> findByGroupName(String groupName){
+        return er.findRomanaExpenceByGroupName(groupName);
+    }
+
     public RomanaExpence createExpence(Date date, Map<String, Double> payingMembers, List<RomanaExpence.Debt> debts,
                                  String description, double cost, String idGroup){
 
@@ -47,22 +51,22 @@ public class RomanaExpenceService {
         return aExpence;
     }
 
-    public RomanaExpence createExpence(RomanaExpence ex, String idGroup) {
+    public RomanaExpence createExpence(RomanaExpence ex, String groupName) {
 
         List<RomanaExpence.Debt> trueDebts = new ArrayList<RomanaExpence.Debt>();
         if(ex.getDebts()!=null) {
             for (RomanaExpence.Debt debt : ex.getDebts()) {
                 debt = dr.insert(new RomanaExpence.Debt(debt.getDebt(), debt.getCreditor(), debt.getDebtor()));
-//            System.out.println(debt);
                 trueDebts.add(debt);
             }
             ex.setDebts(trueDebts);
         }
-
         ex = er.insert(ex);
         mt.update(Group.class)
-                .matching(Criteria.where("idGroup").is(idGroup))
+                .matching(Criteria.where("groupName").is(groupName))
                 .apply(new Update().push("expences").value(ex)).first();
         return ex;
     }
+
+
 }

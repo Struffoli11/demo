@@ -12,6 +12,8 @@ import java.util.Optional;
 @Service
 public class UserService {
     @Autowired
+    public UserService(){}
+    @Autowired
     private MongoTemplate mt;
     @Autowired
     private UserRepository ur;
@@ -19,17 +21,16 @@ public class UserService {
         return ur.findAll();
     }
 
+    public Optional<User> findUserByUsernameAndEmail(String username, String email){
+        return ur.findUserByUsernameAndEmail(username, email);
+    }
+
     public Optional<User> findUserByUsername(String username){
         return ur.findUserByUsername(username);
     }
 
-    public Optional<User> createUser(String username, String password) {
-        if(ur.findUserByUsername(username).isPresent()){
-            return Optional.empty();
-        }
-
-        User user =  ur.insert(new User(username, password));
-        return Optional.of(user);
+    public User createUser(String username, String email) {
+        User user =  ur.insert(new User(username, email));
+        return user;
     }
-
 }

@@ -29,6 +29,8 @@ public class ChestKeyExpence extends Expence{
 
     private Map<String, Double> payingMembers;
 
+    private ExpenceChest ec;
+
     private ExpenceKey ek;
 
     public static class ChestKeyExpenceBuilder{

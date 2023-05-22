@@ -22,21 +22,19 @@ public class User {
 
     private String username;
 
-    //private String email;
+    //private String password;
 
-    private String password;
+    @Field(name = "emailAddress")
+    private String email;
 
-    @Field(value = "groups", write = Field.Write.NON_NULL) @DocumentReference(lazy = true)
-    private List<Group> groups;
+    private List<String> groups;
 
-    @Field(value = "wallet", write = Field.Write.NON_NULL)@DocumentReference(lazy = true)
-    private Wallet wallet;
+    @DocumentReference
+    private List<ExpenceKey> keys;
 
-    public User(String username, String password) {
+    public User(String username, String email) {
         this.username = username;
-        this.password = password;
-        this.groups = new ArrayList<Group>();
-        this.wallet = null;
-
+        this.email = email;
     }
+
 }

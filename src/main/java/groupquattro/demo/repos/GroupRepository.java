@@ -10,4 +10,6 @@ import java.util.Optional;
 @Repository
 public interface GroupRepository extends MongoRepository<Group, ObjectId> {
     Optional<Group> findGroupByIdGroup(String idGroup);
+
+    Optional<Group> findGroupByGroupName(String groupName);
 }

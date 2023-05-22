@@ -33,6 +33,8 @@ public class RomanaExpence extends Expence{
 
     protected  Map<String, Double> payingMembers;
 
+    private String groupName;
+
     @DocumentReference
     private List<Debt> debts;
 
