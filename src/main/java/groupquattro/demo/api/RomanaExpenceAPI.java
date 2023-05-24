@@ -4,6 +4,7 @@ import groupquattro.demo.exceptions.WrongExpenceTypeException;
 import groupquattro.demo.model.Expence;
 import groupquattro.demo.model.Group;
 import groupquattro.demo.model.RomanaExpence;
+import groupquattro.demo.model.RomanaExpenceBuilder;
 import groupquattro.demo.services.GroupService;
 import groupquattro.demo.services.RomanaExpenceService;
 import org.bson.Document;
@@ -62,14 +63,14 @@ public class RomanaExpenceAPI {
 //        }
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
         Date d;
-        RomanaExpence ex = RomanaExpence.builder()
+        RomanaExpence ex = new RomanaExpenceBuilder()
                 .date(sdf.parse(expence.getString("date")))
                 .description(expence.getString("description"))
                 .cost(expence.getDouble("cost"))
                 .payingMembers(payingMembers)
                 .groupName(expence.getString("groupName"))
                 .computeDebts().build();
-                return es.createExpence(ex, expence.getString("groupName"));
+                return es.createExpence(ex);
         }
 
 }

@@ -9,28 +9,31 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.List;
+import java.nio.DoubleBuffer;
 
-@Document(collection = "users")
+@Document(collection = "chests")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class User {
+@AllArgsConstructor
+public class Chest {
+
     @Id
     private ObjectId id;
 
-    private String username;
+    private double max_amount;
 
-    //private String password;
+    private boolean open;
 
-    @Field(name = "emailAddress")
-    private String email;
+    private double currentValue;
 
-    private List<String> groups;
+    @DocumentReference
+    @Field(name = "chestKey")
+    private Key chestKey;
 
-    public User(String username, String email) {
-        this.username = username;
-        this.email = email;
+    public Chest(double max_amount, Key chestKey){
+        this.currentValue = 0;
+        this.max_amount = max_amount;
+        this.chestKey = chestKey;
+        open = false;
     }
-
 }

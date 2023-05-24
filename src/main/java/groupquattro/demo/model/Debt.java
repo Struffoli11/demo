@@ -7,16 +7,24 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "wallets")
+@Document(collection = "debts")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Wallet {
+public class Debt {
 
     @Id
     private ObjectId id;
 
-    private double coins;
+    private String creditor;
 
-    private String idWallet;
+    private String debtor;
+
+    private double debt;
+
+    public Debt(double debt, String creditor, String debtor) {
+        this.debt = debt;
+        this.debtor = debtor;
+        this.creditor = creditor;
+    }
 }
