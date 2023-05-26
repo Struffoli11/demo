@@ -17,6 +17,7 @@ public class UserService {
     private MongoTemplate mt;
     @Autowired
     private UserRepository ur;
+
     public List<User> allUsers(){
         return ur.findAll();
     }

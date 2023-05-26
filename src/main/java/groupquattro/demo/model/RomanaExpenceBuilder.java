@@ -68,6 +68,8 @@ public class RomanaExpenceBuilder implements ExpenceBuilder{
         Map<String, Double> payingMembers = romanaExpence.getPayingMembers();
         List<Debt> debts = new ArrayList<>();
         int nMembers = payingMembers.size();
+        //to make sure that costPerMember has at most
+        //two decimal digits, tha method round() of this class is invoked
         double costPerMember = round(cost/nMembers, 2);
 
         //check for possibility that a member put money for everyone
@@ -95,6 +97,8 @@ public class RomanaExpenceBuilder implements ExpenceBuilder{
         return this;
     }
 
+    //method used within the "computeDebts()" method in this class
+    //to make sure that a double has at most two decimal digits
     public static double round(double value, int places) {
         if (places < 0) throw new IllegalArgumentException();
 

@@ -60,9 +60,9 @@ public class GroupAPI {
         String username = userData.get("username");
         String email = userData.get("email");
         Optional<User> user = us.findUserByUsernameAndEmail(username, email);
-        System.out.println(user.get().getUsername() + " " + user.get().getEmail());
+//        System.out.println(user.get().getUsername() + " " + user.get().getEmail());
         if(user.isPresent()){
-            System.out.println("HELLO THERE");
+//            System.out.println("HELLO THERE");
             Optional<Group> g = gs.addMemberToGroup(groupName, user.get());
             if(g.isPresent()){
                 System.out.println(g.get().getGroupName());

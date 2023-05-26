@@ -4,15 +4,12 @@ import groupquattro.demo.model.*;
 import groupquattro.demo.repos.CKExpenceRepository;
 import groupquattro.demo.repos.ChestRepository;
 import groupquattro.demo.repos.KeyRepository;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
-
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -98,6 +95,11 @@ public class CKExpenceService {
 
         }
         if(chest.getCurrentValue()!=currentValue){
+            if(chest.getCurrentValue() == chest.getMax_amount()){
+                mt.update(Chest.class)
+                        .matching(Criteria.where("_id").is(chest.getId()))
+                        .apply(new Update().set("open", true)).first();
+            }
             mt.update(Chest.class)
                     .matching(Criteria.where("_id").is(chest.getId()))
                     .apply(new Update().set("currentValue", chest.getCurrentValue())).first();

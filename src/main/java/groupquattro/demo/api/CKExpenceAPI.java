@@ -9,7 +9,6 @@ import groupquattro.demo.model.Group;
 import groupquattro.demo.services.CKExpenceService;
 import groupquattro.demo.services.GroupService;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,7 +58,6 @@ public class CKExpenceAPI {
     public CKExpence createExpence(@RequestBody Document expence) throws ParseException, WrongExpenceTypeException {
         Map<String, Double> payingMembers = expence.get("payingMembers", LinkedHashMap.class);
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        Date d;
         CKExpenceBuilder ckeb = new CKExpenceBuilder();
         CKExpence cke = ckeb
                 .date(sdf.parse(expence.getString("date")))
