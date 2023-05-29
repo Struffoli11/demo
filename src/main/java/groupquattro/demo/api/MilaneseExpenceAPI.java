@@ -2,6 +2,7 @@ package groupquattro.demo.api;
 
 import groupquattro.demo.exceptions.ChestNotOpenedException;
 import groupquattro.demo.exceptions.UserNotFoundException;
+import groupquattro.demo.exceptions.UserNotOwnerException;
 import groupquattro.demo.exceptions.WrongExpenceTypeException;
 import groupquattro.demo.model.CKExpence;
 import groupquattro.demo.model.CKExpenceBuilder;
@@ -22,8 +23,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RestController
-@RequestMapping("/CKexpences")
-public class CKExpenceAPI {
+@RequestMapping("/milexpences")
+public class MilaneseExpenceAPI {
     @Autowired
     private GroupService gs;
 
@@ -62,19 +63,22 @@ public class CKExpenceAPI {
         Map<String, Double> payingMembers = expence.get("payingMembers", LinkedHashMap.class);
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
         CKExpenceBuilder ckeb = new CKExpenceBuilder();
+        boolean mil = true;
+        Group g= gs.findGroupByGroupName(expence.getString("groupName")).get();
+        String groupOwner = g.getGroupOwner().getUsername();
         CKExpence cke = ckeb
                 .date(sdf.parse(expence.getString("date")))
                 .description(expence.getString("description"))
                 .cost(expence.getDouble("cost"))
-                .payingMembers(payingMembers)
+                .payingMembers(payingMembers, groupOwner)
                 .groupName(expence.getString("groupName")).build();
 
-        return cks.createCKExpence(ckeb, cke, "");
+        return cks.createCKExpence(ckeb, cke, groupOwner);
     }
 
     @GetMapping("/{expenceId}/withdraw")
     @ResponseStatus(HttpStatus.OK)
-    public Double withdrawFromChest(@PathVariable String expenceId, @RequestBody String user) throws ChestNotOpenedException {
+    public Double withdrawFromChest(@PathVariable String expenceId, @RequestBody String user) throws ChestNotOpenedException, UserNotOwnerException {
         CKExpence cke = null;
         Optional<CKExpence> result;
         Chest chest = null;
@@ -110,6 +114,9 @@ public class CKExpenceAPI {
                     chest = cks.deleteChest(chest, cke);
 
                 }
+                else {
+                    throw new UserNotOwnerException("not an owner!");
+                }
             }
             else {
                 throw new ChestNotOpenedException();
@@ -136,7 +143,7 @@ public class CKExpenceAPI {
                     double value = cke.getDebtors().get(debtor);
                     oldChest = cke.getChest();
                     currentValue = oldChest.getCurrentValue();
-                    oldChest.setCurrentValue(round(currentValue - value, 2));
+                    oldChest.setCurrentValue(currentValue - value);
                     if (oldChest.getCurrentValue() >= oldChest.getMax_amount()) {
                         oldChest.setOpen(true);
                     }

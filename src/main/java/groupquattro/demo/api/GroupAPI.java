@@ -4,7 +4,6 @@ import groupquattro.demo.exceptions.UserAlreadyAMemberException;
 import groupquattro.demo.exceptions.UserNotFoundException;
 import groupquattro.demo.model.Group;
 import groupquattro.demo.model.User;
-import groupquattro.demo.repos.UserRepository;
 import groupquattro.demo.services.GroupService;
 import groupquattro.demo.services.UserService;
 import org.bson.Document;

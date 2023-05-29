@@ -5,6 +5,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.Date;
 import java.util.List;
@@ -23,6 +24,9 @@ public class CKExpence implements Expence{
 
     @DocumentReference
     private Chest chest;
+
+    @Field(name = "debtors")
+    private Map<String, Double> debtors;
 
     private String groupName;
 

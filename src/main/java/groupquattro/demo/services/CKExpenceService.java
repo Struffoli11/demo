@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.StringJoiner;
 
 @Service
 public class CKExpenceService {
@@ -39,9 +40,9 @@ public class CKExpenceService {
         return ckr.findAll();
     }
 
-    public CKExpence createCKExpence(CKExpenceBuilder ckeb, CKExpence cke)
+    public CKExpence createCKExpence(CKExpenceBuilder ckeb, CKExpence cke, String groupOwner)
     {
-        createChestAndKey(ckeb, cke);
+        cke = createChestAndKey(ckeb, cke, groupOwner);
         mt.update(Group.class)
                 .matching(Criteria.where("groupName").is(cke.getGroupName()))
                 .apply(new Update().push("expences").value(cke)).first();
@@ -49,9 +50,9 @@ public class CKExpenceService {
         return cke;
     }
 
-    public CKExpence createChestAndKey(CKExpenceBuilder ckeb, CKExpence ckExpence) {
+    public CKExpence createChestAndKey(CKExpenceBuilder ckeb, CKExpence ckExpence, String groupOwner) {
 
-        CKExpence ckExpence1 = ckeb.chest(ckExpence.getCost(), ckExpence.getPayingMembers()).build();
+        CKExpence ckExpence1 = ckeb.chest(ckExpence.getCost(), ckExpence.getPayingMembers(), groupOwner).build();
         Chest chest = ckExpence1.getChest();
         Key chestKey = chest.getChestKey();
 
@@ -95,6 +96,11 @@ public class CKExpenceService {
 
         }
         if(chest.getCurrentValue()!=currentValue){
+            if(cke.getDebtors().keySet().size()!=oldExpence.getDebtors().keySet().size()){
+                mt.update(CKExpence.class)
+                        .matching(Criteria.where("_id").is(cke.getId()))
+                        .apply(new Update().set("debtors", cke.getDebtors())).first();
+            }
             if(chest.getCurrentValue() == chest.getMax_amount()){
                 mt.update(Chest.class)
                         .matching(Criteria.where("_id").is(chest.getId()))
