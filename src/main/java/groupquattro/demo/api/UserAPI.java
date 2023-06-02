@@ -23,7 +23,7 @@ public class UserAPI {
     @Autowired
     GroupService gs;
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<User>> getAllUsers(){
         return new ResponseEntity<List<User>>(us.allUsers(), HttpStatus.OK);
     }

@@ -143,7 +143,7 @@ public class MilaneseExpenceAPI {
                     double value = cke.getDebtors().get(debtor);
                     oldChest = cke.getChest();
                     currentValue = oldChest.getCurrentValue();
-                    oldChest.setCurrentValue(currentValue - value);
+                    oldChest.setCurrentValue(round(currentValue - value, 2));
                     if (oldChest.getCurrentValue() >= oldChest.getMax_amount()) {
                         oldChest.setOpen(true);
                     }

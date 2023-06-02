@@ -8,17 +8,30 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.swing.text.html.HTML;
-
 
 @RestController()
 @RequestMapping("/coinfly")
 public class CoinFlyAPI {
 
-    @GetMapping
+    @GetMapping("/home")
     @ResponseStatus(HttpStatus.OK)
-    public String getHome(){
-        return "welcome";
+    public String index(){
+        return "/index";
+    }
+    @ResponseStatus(HttpStatus.OK)
+    public String formLogin(){
+        return "/login";
+    }
+
+
+    @ResponseStatus(HttpStatus.OK)
+    public String formRegistration(){
+        return "/registration";
+    }
+
+    @RequestMapping("/logout-success")
+    public String logoutPage() {
+        return "index";
     }
 
 }

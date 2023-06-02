@@ -22,7 +22,7 @@ public class GroupAPI {
 
     @Autowired
     private GroupService gs;
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<Group>> getAllGroups(){
         return new ResponseEntity<List<Group>>(gs.allGroups(), HttpStatus.OK);
     }
