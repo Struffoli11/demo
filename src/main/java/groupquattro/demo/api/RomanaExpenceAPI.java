@@ -56,17 +56,34 @@ public class RomanaExpenceAPI {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public RomanaExpence createExpence(@RequestBody Document expence) throws ParseException, WrongExpenceTypeException {
-        Map<String, Double> payingMembers = expence.get("payingMembers", LinkedHashMap.class);
-//        for(String member : payingMembers.keySet()){
-//            System.out.println(payingMembers.get(member));
-//            System.out.println(member);
-//        }
+        Map<String, Double> payingMembers = new LinkedHashMap<>();
+
+        Map<String, String> dataMap= expence.get("payingMembers", LinkedHashMap.class);
+
+        System.out.println("Is data empty? "+ (dataMap.isEmpty() ? "jah!" : "nein!"));
+
+        for(String member : dataMap.keySet()){
+            System.out.println(member);
+        }
+
+
+      for(String member : dataMap.keySet()){
+        payingMembers.put(member, Double.valueOf(dataMap.get(member)));
+      }
+
+        System.out.println(payingMembers.isEmpty());
+        for(String member : payingMembers.keySet()){
+            System.out.println(member+ payingMembers.get(member));
+        }
+        System.out.println(expence.get("date"));
+        double cost = Double.valueOf(expence.getString("cost")).doubleValue();
+        System.out.println(expence.get("description"));
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
         Date d;
         RomanaExpence ex = new RomanaExpenceBuilder()
                 .date(sdf.parse(expence.getString("date")))
                 .description(expence.getString("description"))
-                .cost(expence.getDouble("cost"))
+                .cost(cost)
                 .payingMembers(payingMembers)
                 .groupName(expence.getString("groupName"))
                 .computeDebts().build();
