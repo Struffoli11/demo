@@ -31,6 +31,9 @@ public class CKExpenceService {
 
     private CKExpenceBuilder ckeb;
 
+    public Optional<CKExpence> findExpenceByIdExpence(String idExpence){
+        return ckr.findCKExpenceById(idExpence);
+    }
     public List<CKExpence> findByGroupName(String groupName) {
         return ckr.findByGroupName(groupName);
     }

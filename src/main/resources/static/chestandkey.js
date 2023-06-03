@@ -1,5 +1,5 @@
 
-var url = "http://172.31.6.4:8080/CKexpences";
+var url = "http://localhost:8080/CKexpences";
 
 function createExpence() {
     try {
@@ -42,12 +42,25 @@ function createExpence() {
             };
 
 
-        fetch(url, {
+        const unique_id = fetch(url, {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
-        }).then(res => {
-            console.log("Request complete! response:", res);
+        }).then(response => response.json())
+            .then((expence) => {
+                return expence.id;
+            });
+        /* unique_id is not equal to id itself
+        but instead is equal to a Promise Object. This is happening
+         because the Javascript code always executes synchronously,
+          so the console.log() function starts immediately after the fetch() request,
+           not waiting until it is resolved. In the moment when console.log() function
+            starting to run, a Promise that should be returned from a fetch() request
+             is in a pending status. */
+
+        /**solution: use then() function */
+        unique_id.then((a) => {
+            window.location.href = "mil.html?id=" + a;
         });
     } catch (e) {
         alert(e);

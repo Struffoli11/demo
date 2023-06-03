@@ -20,7 +20,7 @@ import java.util.Map;
 public class CKExpence implements Expence{
 
     @Id
-    private ObjectId id;
+    private String id;
 
     @DocumentReference
     private Chest chest;

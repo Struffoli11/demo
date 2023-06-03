@@ -8,11 +8,19 @@
 </head>
 <body>
     <script>
-        function createExpence(){
+        function createMExpence(){
+            window.location.href = "createMil.html"
+        }
+        function createRExpence(){
             window.location.href = "createRomana.html"
+        }
+        function createCKExpence(){
+            window.location.href = "createCKE.html"
         }
     </script>
     <h1>Welcome home</h1>
-    <input type="button" value="Create Romana Expence" onclick= "createExpence()">
+    <input type="button" value="Create Romana Expence" onclick= "createRExpence()">
+    <input type="button" value="Create Milanese Expence" onclick= "createMExpence()">
+    <input type="button" value="Create a Chest&Key Expence" onclick= "createCKExpence()">
 </body>
 </html>

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CKExpenceRepository extends MongoRepository<CKExpence, ObjectId> {
+public interface CKExpenceRepository extends MongoRepository<CKExpence, String> {
 
     @Query(value = "{ 'groupName' : ?0 }")
     List<CKExpence> findByGroupName(String groupName);
