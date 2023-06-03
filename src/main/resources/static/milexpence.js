@@ -1,5 +1,5 @@
 
-var url = "http://localhost:8080/milexpences";
+var url = "http://172.31.6.4:8080/milexpences";
      
         function createExpence(){
            try{

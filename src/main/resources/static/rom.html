@@ -24,7 +24,7 @@
         const urlParams = new URLSearchParams(queryString);
         const expence_id = urlParams.get('id')
         console.log(expence_id);
-        var url = "http://localhost:8080/expences/" + expence_id;
+        var url = "http://172.31.6.4:8080/expences/" + expence_id;
 
         const result = fetch(url, {
             method: "GET"

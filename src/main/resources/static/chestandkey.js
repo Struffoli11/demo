@@ -1,5 +1,5 @@
 
-var url = "http://localhost:8080/CKexpences";
+var url = "http://172.31.6.4:8080/CKexpences";
 
 function createExpence() {
     try {
