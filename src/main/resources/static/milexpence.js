@@ -1,9 +1,5 @@
-<html>
-  <head>
-    <title> Romana </title>
-    <meta charset="UTF-8">
-    <script>
-        var url = "http://localhost:8080/expences";
+
+var url = "http://localhost:8080/milexpences";
      
         function createExpence(){
            try{
@@ -23,11 +19,19 @@
                         }
                     }catch(e) {
                         alert(e);
-                    }/* 
-                    payingMembersMap.forEach((values, keys) => {
-                        console.log(values, keys)
-                    }) */
-                    /* console.log(payingMembersMap); */
+                    }/*purtoppo nei dati non possiamo aggiungere direttamente come "parametro" una Map
+                    poichè questa non è compatibile con il metodo JSON.stringify(data)
+                    che usiamo per trasformare i dati che vogliamo passare alla api
+                    dal file html. Per questo payingMembers viene trasformato in un oggetto che poi
+                    all'interno della api viene convertito in una HashMap<String, String>.
+                    Problemi simili si hanno per quanto riguarda i numeri. In javascript
+                    a quanto pare non si fa distinzione tra interi float e double
+                    ossia 1 = 1.00 senza distinzione tra i due
+                    Di conseguenza non posso passare alla api dei double (come facevamo da postman)
+                    ma siamo costretti a passare delle stringhe, e successivamente all'interno della api
+                    queste devono essere convertite in valori in virgola mobile.
+                    document.getElementById("inp_ExpenceCost").value restituisce una stringa infatti
+                     */
                     let 
                         data = {
                                 cost: document.getElementById("inp_ExpenceCost").value,
@@ -51,6 +55,8 @@
 
         }
 
+    //questo metodo aggiunge una riga alla tabella per
+    //aggiungere le quote dei membri
       function addRow(tableID) {
 
         var table = document.getElementById(tableID);
@@ -80,6 +86,8 @@
         }
     }
 
+    //questo metodo cancella tutte le righe spuntate dalla tabella
+    //che raccoglie le quote dei membri
     function deleteRow(tableID) {
         try {
         var table = document.getElementById(tableID);
@@ -104,46 +112,3 @@
             alert(e);
         }
     }
-
-    </script>
-  </head>
-  <body>
-    <form id = "form">
-
-        <!-- get the cost as a string -->
-        <label for = "inp_ExpenceCost" > How much did the expence cost? </label>
-        <input type="number" step="0.01" id="inp_ExpenceCost">
-        <br>
-        <br>
-        
-        <!-- collect how much did each member spend-->
-        <label for = "inp_ExpenceMembers" > How much did each member spend? </label>
-        
-        <INPUT type="button" value="Add Row" onclick="addRow('dataTable')" />
-
-        <INPUT type="button" value="Delete Row" onclick="deleteRow('dataTable')" />
-        <table id="dataTable" width="350px" border="1">
-            <tr>
-                <td><input type="checkbox" id=" check"></td>
-                <td><input type="text" id = "username"></td>
-                <td><input type="number" step="0.01" id = "val"></td>
-            </tr>
-        </table>
-        <br>
-        <br>
-
-        <!-- get the date -->
-        <label for = "inp_ExpenceDate" > Date</label>
-        <input type="text" name="inp_ExpenceDate" id="inp_ExpenceDate" value="DD/MM/YYYY">
-        <br>
-        <br>
-
-        <!-- this expence can be later searched for through this descritpion -->
-        <label for = "inp_ExpenceName" > Give a meaningful description </label>
-        <input type="text" name="inp_ExpenceName" id="inp_ExpenceName" value="">
-        <br>
-        <br>
-    </form>
-    <input type="button" value="Create Expence" onclick="createExpence()">
-  </body>
-</html>

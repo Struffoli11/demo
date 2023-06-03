@@ -20,7 +20,7 @@ import java.util.*;
 public class RomanaExpence implements Expence{
 
     @Id
-    private ObjectId id;
+    private String id;
 
     private String description;
 

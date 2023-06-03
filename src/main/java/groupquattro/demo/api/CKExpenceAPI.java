@@ -59,13 +59,23 @@ public class CKExpenceAPI {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CKExpence createExpence(@RequestBody Document expence) throws ParseException, WrongExpenceTypeException {
-        Map<String, Double> payingMembers = expence.get("payingMembers", LinkedHashMap.class);
+        Map<String, Double> payingMembers = new LinkedHashMap<String, Double>();
+
+        Map<String, String> dataMap= expence.get("payingMembers", LinkedHashMap.class);
+
+//        System.out.println("Is data empty? "+ (dataMap.isEmpty() ? "jah!" : "nein!"));
+
+        for(String member : dataMap.keySet()){
+            payingMembers.put(member, Double.valueOf(dataMap.get(member)));
+        }
+        double cost = Double.valueOf(expence.getString("cost")).doubleValue();
+
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
         CKExpenceBuilder ckeb = new CKExpenceBuilder();
         CKExpence cke = ckeb
                 .date(sdf.parse(expence.getString("date")))
                 .description(expence.getString("description"))
-                .cost(expence.getDouble("cost"))
+                .cost(cost)
                 .payingMembers(payingMembers)
                 .groupName(expence.getString("groupName")).build();
 

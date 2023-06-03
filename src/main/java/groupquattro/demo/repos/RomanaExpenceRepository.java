@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface RomanaExpenceRepository extends MongoRepository<RomanaExpence, ObjectId> {
+public interface RomanaExpenceRepository extends MongoRepository<RomanaExpence, String> {
     Optional<RomanaExpence> findRomanaExpenceById(String id);
 
 //    @Query(value = "{ 'description' : ?0 }", fields = "{ 'description' : 1, 'date' : 1 }")

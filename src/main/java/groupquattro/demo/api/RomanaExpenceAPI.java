@@ -60,12 +60,7 @@ public class RomanaExpenceAPI {
 
         Map<String, String> dataMap= expence.get("payingMembers", LinkedHashMap.class);
 
-        System.out.println("Is data empty? "+ (dataMap.isEmpty() ? "jah!" : "nein!"));
-
-        for(String member : dataMap.keySet()){
-            System.out.println(member);
-        }
-
+//        System.out.println("Is data empty? "+ (dataMap.isEmpty() ? "jah!" : "nein!"));
 
       for(String member : dataMap.keySet()){
         payingMembers.put(member, Double.valueOf(dataMap.get(member)));
@@ -75,11 +70,12 @@ public class RomanaExpenceAPI {
         for(String member : payingMembers.keySet()){
             System.out.println(member+ payingMembers.get(member));
         }
-        System.out.println(expence.get("date"));
+//        System.out.println(expence.get("date"));
+
         double cost = Double.valueOf(expence.getString("cost")).doubleValue();
-        System.out.println(expence.get("description"));
+//        System.out.println(expence.get("description"));
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        Date d;
+//        Date d;
         RomanaExpence ex = new RomanaExpenceBuilder()
                 .date(sdf.parse(expence.getString("date")))
                 .description(expence.getString("description"))
