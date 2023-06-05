@@ -1,5 +1,9 @@
 package groupquattro.demo.services;
 
+import groupquattro.demo.exceptions.ChestNotOpenedException;
+import groupquattro.demo.exceptions.ChestOpenedException;
+import groupquattro.demo.exceptions.UserNotDebtorException;
+import groupquattro.demo.exceptions.UserNotOwnerException;
 import groupquattro.demo.model.*;
 import groupquattro.demo.repos.CKExpenceRepository;
 import groupquattro.demo.repos.ChestRepository;
@@ -13,10 +17,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.StringJoiner;
 
 @Service
-public class CKExpenceService {
+public abstract class CKExpenceService {
     @Autowired
     MongoTemplate mt;
 
@@ -43,7 +46,66 @@ public class CKExpenceService {
         return ckr.findAll();
     }
 
-    public CKExpence createCKExpence(CKExpenceBuilder ckeb, CKExpence cke, String groupOwner)
+    public boolean withdraw(CKExpence me, Chest chest, String user) throws UserNotOwnerException, ChestNotOpenedException{
+        if(chest.isOpen()) {
+            Map<String, Double> chestKeyOwners = chest.getChestKey().getListOfOwners();
+            if (chestKeyOwners.get(user)!=null) {
+                double amount = chestKeyOwners.get(user);
+                double newValue = chest.withdraw(amount);
+                chestKeyOwners.remove(user);
+                if(chestKeyOwners.isEmpty()) {
+                    //everyone got their share, delete chest
+                    chest = deleteChest(chest, me);
+                    return true;
+                }
+                else {
+                    //update collection chests
+                    //with new value stored in chest
+                    chest = updateChest(chest, me);
+                    return false;
+                }
+            }
+            else {
+                throw new UserNotOwnerException("not an owner!");
+            }
+        }
+        else {
+            throw new ChestNotOpenedException();
+        }
+    }
+
+    public boolean deposit(CKExpence me, Chest chest, String user) throws ChestOpenedException, UserNotDebtorException{
+        if(!chest.isOpen()) {
+            Map<String, Double> expenceDebtors = me.getDebtors();
+            if (expenceDebtors.get(user)!=null) {
+                double amount = expenceDebtors.get(user);
+                double newValue = chest.deposit(amount);
+                expenceDebtors.remove(user);
+                if(expenceDebtors.isEmpty()) {
+                    //everyone got their share, delete chest
+                    chest.setOpen(true);
+                    //update collection chests
+                    //with new value stored in chest
+                    chest = updateChest(chest, me);
+                    return true;
+                }
+                else {
+                    //update collection chests
+                    //with new value stored in chest
+                    chest = updateChest(chest, me);
+                    return false;
+                }
+            }
+            else {
+                throw new UserNotDebtorException("not a debtor!");
+            }
+        }
+        else {
+            throw new ChestOpenedException();
+        }
+    }
+
+    public CKExpence createExpence(CKExpenceBuilder ckeb, CKExpence cke, String groupOwner)
     {
         cke = createChestAndKey(ckeb, cke, groupOwner);
         mt.update(Group.class)
@@ -83,37 +145,10 @@ public class CKExpenceService {
         return ckr.findCKExpenceById(idExpence);
     }
 
-    public Chest updateChest(double currentValue, Chest chest, CKExpence cke) {
-        CKExpence oldExpence = ckr.findCKExpenceById(cke.getId().toString()).get();
-        Map<String, Double> oldOwners = oldExpence.getChest().getChestKey().getListOfOwners();
-        if(chest.getChestKey().getListOfOwners().keySet().size()!=oldOwners.keySet().size()){
-            //update key
-            mt.update(Key.class)
-                    .matching(Criteria.where("_id").is(chest.getChestKey().getId()))
-                    .apply(new Update().set("listOfOwners", chest.getChestKey().getListOfOwners())).first();
-
-            //update chest
-            mt.update(Chest.class)
-                    .matching(Criteria.where("_id").is(chest.getId()))
-                    .apply(new Update().set("currentValue", chest.getCurrentValue())).first();
-
-        }
-        if(chest.getCurrentValue()!=currentValue){
-            if(cke.getDebtors().keySet().size()!=oldExpence.getDebtors().keySet().size()){
-                mt.update(CKExpence.class)
-                        .matching(Criteria.where("_id").is(cke.getId()))
-                        .apply(new Update().set("debtors", cke.getDebtors())).first();
-            }
-            if(chest.getCurrentValue() == chest.getMax_amount()){
-                mt.update(Chest.class)
-                        .matching(Criteria.where("_id").is(chest.getId()))
-                        .apply(new Update().set("open", true)).first();
-            }
-            mt.update(Chest.class)
-                    .matching(Criteria.where("_id").is(chest.getId()))
-                    .apply(new Update().set("currentValue", chest.getCurrentValue())).first();
-        }
-
+    public Chest updateChest(Chest chest, CKExpence cke) {
+        mt.save(chest.getChestKey());
+        mt.save(chest);
+        mt.save(cke);
         return chest;
     }
 
@@ -133,4 +168,6 @@ public class CKExpenceService {
         System.out.println(removedChest);
             return removedChest;
     }
+
+
 }

@@ -1,14 +1,15 @@
 package groupquattro.demo.model;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import groupquattro.demo.utils.Round;
+
 import java.util.*;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.stream.Collectors;
 
 public class CKExpenceBuilder implements ExpenceBuilder{
 
     private CKExpence cKExpence;
+
+    private MExpence mExpence;
+
 
     public CKExpenceBuilder(){
         reset();
@@ -19,6 +20,11 @@ public class CKExpenceBuilder implements ExpenceBuilder{
     }
     public CKExpence build() {
         return cKExpence;
+    }
+
+    public MExpence buildM(){
+        this.mExpence = new MExpence(cKExpence);
+        return mExpence;
     }
     public CKExpenceBuilder cost(double cost) {
         cKExpence.setCost(cost);
@@ -53,11 +59,11 @@ public class CKExpenceBuilder implements ExpenceBuilder{
         Key key;
         Map<String, Double> creditors = new LinkedHashMap<>();
         Chest chest;
-        double qpc = round(cost/payingMembers.keySet().size(), 2);
+        double qpc = Round.round(cost/payingMembers.keySet().size(), 2);
         double amountThatOpensTheChest = 0.00;
         cKExpence.setDebtors(new LinkedHashMap<>());
         for(String member : payingMembers.keySet()){
-            double diff = round(payingMembers.get(member)-qpc, 2);
+            double diff = Round.round(payingMembers.get(member)-qpc, 2);
             if(diff<= 0){
                 //this member is a debtor
                 cKExpence.getDebtors().put(member, diff);
@@ -74,7 +80,7 @@ public class CKExpenceBuilder implements ExpenceBuilder{
         //and the other has to be passed as
         // a parameter to the Key class constructor
         key = new Key(creditors);
-        chest = new Chest(round(amountThatOpensTheChest, 2), key);
+        chest = new Chest(Round.round(amountThatOpensTheChest, 2), key);
         cKExpence.setChest(chest);
         return this;
     }
@@ -87,11 +93,11 @@ public class CKExpenceBuilder implements ExpenceBuilder{
         Chest chest;
         if(groupOwner.equals("")) {
             //ckexpenceAPI
-            double qpc = round(cost / payingMembers.keySet().size(), 2);
+            double qpc = Round.round(cost / payingMembers.keySet().size(), 2);
             double amountThatOpensTheChest = 0.00;
             cKExpence.setDebtors(new LinkedHashMap<>());
             for (String member : payingMembers.keySet()) {
-                double diff = round(payingMembers.get(member) - qpc, 2);
+                double diff = Round.round(payingMembers.get(member) - qpc, 2);
                 if (diff <= 0) {
                     //this member is a debtor
                     cKExpence.getDebtors().put(member, diff);
@@ -107,7 +113,7 @@ public class CKExpenceBuilder implements ExpenceBuilder{
             //and the other has to be passed as
             // a parameter to the Key class constructor
             key = new Key(creditors);
-            chest = new Chest(round(amountThatOpensTheChest, 2), key);
+            chest = new Chest(Round.round(amountThatOpensTheChest, 2), key);
             cKExpence.setChest(chest);
         }
         else{
@@ -159,13 +165,7 @@ public class CKExpenceBuilder implements ExpenceBuilder{
 //        return this;
 //    }
 
-    public static double round(double value, int places) {
-        if (places < 0) throw new IllegalArgumentException();
 
-        BigDecimal bd = BigDecimal.valueOf(value);
-        bd = bd.setScale(places, RoundingMode.HALF_UP);
-        return bd.doubleValue();
-    }
 
 
 }

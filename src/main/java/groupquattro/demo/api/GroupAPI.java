@@ -27,6 +27,11 @@ public class GroupAPI {
         return new ResponseEntity<List<Group>>(gs.allGroups(), HttpStatus.OK);
     }
 
+//    @GetMapping("/lenostrespese") da proteggere con ruolo utente e/o admin
+//    PUBLIC LIST<SPESA> GETSPESEGRUPPO(STRING GROUP){
+//        RITORNA LA LISTA DI SPESA DI UN  GRUPPO
+//    }
+
     @GetMapping("/{groupName}")
     @ResponseStatus(HttpStatus.OK)
     public Optional<Group> getGroup(@PathVariable String groupName){

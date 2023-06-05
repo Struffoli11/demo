@@ -1,5 +1,6 @@
 package groupquattro.demo.services;
 
+import groupquattro.demo.model.Group;
 import groupquattro.demo.model.User;
 import groupquattro.demo.repos.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,4 +35,6 @@ public class UserService {
         User user =  ur.insert(new User(username, email));
         return user;
     }
+
+
 }

@@ -5,6 +5,7 @@ import groupquattro.demo.model.Group;
 import groupquattro.demo.model.User;
 import groupquattro.demo.services.GroupService;
 import groupquattro.demo.services.UserService;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,5 +56,15 @@ public class UserAPI {
             return aGroup.orElse(null);
         }
         throw  new UserNotFoundException("user not found");
+    }
+
+    @GetMapping("/{username}/groups")
+    @ResponseStatus(HttpStatus.OK)
+    public List<String> getUserGroups(@PathVariable String username){
+        Optional<User> aUser = us.findUserByUsername(username);
+        if(aUser.isPresent()){
+            return aUser.get().getGroups();
+        }
+        return null;
     }
 }

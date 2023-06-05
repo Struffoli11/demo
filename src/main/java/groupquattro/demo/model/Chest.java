@@ -1,5 +1,6 @@
 package groupquattro.demo.model;
 
+import groupquattro.demo.utils.Round;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,5 +36,15 @@ public class Chest {
         this.max_amount = max_amount;
         this.chestKey = chestKey;
         open = false;
+    }
+
+    public double withdraw(double amount) {
+        this.setCurrentValue(Round.round(this.getCurrentValue()-amount, 2));
+        return this.getCurrentValue();
+    }
+
+    public double deposit(double amount) {
+        this.setCurrentValue(Round.round(this.getCurrentValue()-amount, 2));
+        return this.getCurrentValue();
     }
 }

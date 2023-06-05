@@ -1,8 +1,6 @@
 package groupquattro.demo.api;
 
-import groupquattro.demo.exceptions.ChestNotOpenedException;
-import groupquattro.demo.exceptions.UserNotFoundException;
-import groupquattro.demo.exceptions.WrongExpenceTypeException;
+import groupquattro.demo.exceptions.*;
 import groupquattro.demo.model.CKExpence;
 import groupquattro.demo.model.CKExpenceBuilder;
 import groupquattro.demo.model.Chest;
@@ -59,8 +57,8 @@ public class CKExpenceAPI {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CKExpence createExpence(@RequestBody Document expence) throws ParseException, WrongExpenceTypeException {
+        //------data conversion start
         Map<String, Double> payingMembers = new LinkedHashMap<String, Double>();
-
         Map<String, String> dataMap= expence.get("payingMembers", LinkedHashMap.class);
 
 //        System.out.println("Is data empty? "+ (dataMap.isEmpty() ? "jah!" : "nein!"));
@@ -69,8 +67,10 @@ public class CKExpenceAPI {
             payingMembers.put(member, Double.valueOf(dataMap.get(member)));
         }
         double cost = Double.valueOf(expence.getString("cost")).doubleValue();
-
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        //----data conversion end
+
+        //should substitute with DTO
         CKExpenceBuilder ckeb = new CKExpenceBuilder();
         CKExpence cke = ckeb
                 .date(sdf.parse(expence.getString("date")))
@@ -79,94 +79,53 @@ public class CKExpenceAPI {
                 .payingMembers(payingMembers)
                 .groupName(expence.getString("groupName")).build();
 
-        return cks.createCKExpence(ckeb, cke, "");
+        return cks.createExpence(ckeb, cke, "");
     }
 
+    //DA PROTEGGERE CON RUOLO ADMIN
     @GetMapping("/{expenceId}/withdraw")
     @ResponseStatus(HttpStatus.OK)
-    public Double withdrawFromChest(@PathVariable String expenceId, @RequestBody String user) throws ChestNotOpenedException {
-        CKExpence cke = null;
+    public void withdrawFromChest(@PathVariable String expenceId, @RequestBody String user) throws ChestNotOpenedException, UserNotOwnerException, WrongExpenceTypeException {
+        CKExpence cke;
         Optional<CKExpence> result;
-        Chest chest = null;
-        double newvalue, oldvalue;
-        newvalue=oldvalue=0;
-        boolean update = false;
-        if((result= cks.findCKExpenceByIdExpence(expenceId)).isPresent()){
+        Chest chest;
+        if((result= cks.findCKExpenceByIdExpence(expenceId)).isPresent()) {
             cke = result.get();
             chest = cke.getChest();
-            if(chest.isOpen()) {
-                Map<String, Double> chestKeyOwners = chest.getChestKey().getListOfOwners();
-                for (String owner : chestKeyOwners.keySet()) {
-                    if (user.equals(owner)) {
-                        update = true;
-                        double withdrawable = chestKeyOwners.get(user);
-                        oldvalue = chest.getCurrentValue();
-                        newvalue = round(chest.getCurrentValue() - withdrawable, 2);
-
-                    }
-                }
-                if(newvalue>0 && update) {
-                    chest.setCurrentValue(newvalue);
-                    chestKeyOwners.remove(user);
-
-                    //update collection
-                    chest = cks.updateChest(oldvalue, chest, cke);
-                    if(chest.getChestKey().getListOfOwners().isEmpty()){
-                        cks.deleteChest(chest, cke);
-                    }
-                }
-                else if (update){
-                    //delete chest
-                    chest = cks.deleteChest(chest, cke);
-
-                }
-            }
-            else {
-                throw new ChestNotOpenedException();
+            //check that this use is an owner
+            try{
+                cks.withdraw(cke, chest, user);
+            }catch (UserNotOwnerException e){
+                throw e;
+            }catch (ChestNotOpenedException e){
+                throw e;
             }
         }
-        return chest.getCurrentValue();
+        else{
+            throw new WrongExpenceTypeException();
+        }
     }
 
     @PostMapping("/{expenceId}/payment")
     @ResponseStatus(HttpStatus.OK)
-    public Chest depositChest(@PathVariable String expenceId, @RequestBody String username) {
-        CKExpence cke = null;
+    public void depositChest(@PathVariable String expenceId, @RequestBody String username) throws UserNotDebtorException, ChestOpenedException, WrongExpenceTypeException {
+        CKExpence cke;
         Optional<CKExpence> result;
-        Chest oldChest = null;
-        Chest updatedChest = null;
-        boolean found = false;
-        double currentValue = 0;
+        Chest chest;
         if ((result = cks.findCKExpenceByIdExpence(expenceId)).isPresent()) {
             cke = result.get();
+            chest = cke.getChest();
             //check that this member is a debtor
-            for (String debtor : cke.getDebtors().keySet())
-                if (username.equals(debtor)) {
-                    found = true;
-                    double value = cke.getDebtors().get(debtor);
-                    oldChest = cke.getChest();
-                    currentValue = oldChest.getCurrentValue();
-                    oldChest.setCurrentValue(round(currentValue - value, 2));
-                    if (oldChest.getCurrentValue() >= oldChest.getMax_amount()) {
-                        oldChest.setOpen(true);
-                    }
-                    break;
-                }
-
+            try{
+                cks.deposit(cke, chest, username);
+            }catch (UserNotDebtorException e){
+                throw e;
+            }catch (ChestOpenedException e){
+                throw e;
+            }
         }
-        if(found) {
-            cke.getDebtors().remove(username);
-            //update operations
-            updatedChest = cks.updateChest(currentValue, oldChest, cke);
+        else {
+            throw new WrongExpenceTypeException();
         }
-        else throw new UserNotFoundException("not a debtor");
-        return updatedChest;
-    }
-    public static double round(double value, int places) {
-        if (places < 0) throw new IllegalArgumentException();
-
-        BigDecimal bd = BigDecimal.valueOf(value);
-        bd = bd.setScale(places, RoundingMode.HALF_UP);
-        return bd.doubleValue();
     }
 }

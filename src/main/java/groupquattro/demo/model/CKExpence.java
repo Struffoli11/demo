@@ -1,5 +1,6 @@
 package groupquattro.demo.model;
 
+import groupquattro.demo.utils.Round;
 import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -38,12 +39,13 @@ public class CKExpence implements Expence{
 
     private Map<String, Double> payingMembers;
     public CKExpence(double cost, Map<String, Double> payingMembers,
-                     String description, Date date, String groupName, Chest chest) {
+                     String description, Date date, String groupName, Chest chest, Map<String, Double> debtors) {
         this.date = date;
         this.cost = cost;
         this.groupName = groupName;
         this.description = description;
         this.chest = chest;
+        this.debtors = debtors;
     }
 
     public CKExpence(double cost, Map<String, Double> payingMembers,
@@ -52,5 +54,18 @@ public class CKExpence implements Expence{
         this.cost = cost;
         this.groupName = groupName;
         this.description = description;
+    }
+
+    /**
+     *
+     * @param amount to withdraw from chest
+     * @return the amount still within chest
+     */
+    public double withdraw(double amount){
+        return this.chest.withdraw(amount);
+    }
+
+    public double deposit(double amount){
+        return this.chest.deposit(amount);
     }
 }

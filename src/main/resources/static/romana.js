@@ -1,5 +1,5 @@
 
-var url = "http://172.31.6.4:8080/expences";
+var url = "http://localhost:8080/expences";
      
         function createExpence(){
            try{
