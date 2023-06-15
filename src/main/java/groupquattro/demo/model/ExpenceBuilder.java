@@ -1,8 +1,5 @@
 package groupquattro.demo.model;
 
-import java.util.Date;
-import java.util.Map;
-
 public interface ExpenceBuilder {
 
 //    public ExpenceBuilder date(Date date);

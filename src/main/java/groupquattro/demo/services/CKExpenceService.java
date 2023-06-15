@@ -1,173 +1,22 @@
 package groupquattro.demo.services;
 
-import groupquattro.demo.exceptions.ChestNotOpenedException;
-import groupquattro.demo.exceptions.ChestOpenedException;
-import groupquattro.demo.exceptions.UserNotDebtorException;
-import groupquattro.demo.exceptions.UserNotOwnerException;
-import groupquattro.demo.model.*;
-import groupquattro.demo.repos.CKExpenceRepository;
-import groupquattro.demo.repos.ChestRepository;
-import groupquattro.demo.repos.KeyRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.stereotype.Service;
+import groupquattro.demo.dto.CKExpenceFormDto;
+import groupquattro.demo.dto.CKExpenceSummaryDto;
+import groupquattro.demo.exceptions.*;
+
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
-@Service
-public abstract class CKExpenceService {
-    @Autowired
-    MongoTemplate mt;
-
-    @Autowired
-    private KeyRepository kr;
-
-    @Autowired
-    private ChestRepository cr;
-
-    @Autowired
-    private CKExpenceRepository ckr;
-
-    private CKExpenceBuilder ckeb;
-
-    public Optional<CKExpence> findExpenceByIdExpence(String idExpence){
-        return ckr.findCKExpenceById(idExpence);
-    }
-    public List<CKExpence> findByGroupName(String groupName) {
-        return ckr.findByGroupName(groupName);
-    }
+public interface CKExpenceService {
 
 
-    public List<CKExpence> getAllCKExpences(){
-        return ckr.findAll();
-    }
+    CKExpenceSummaryDto findCKExpenceByIdExpence(String idExpence) throws ResourceNotFoundException;
 
-    public boolean withdraw(CKExpence me, Chest chest, String user) throws UserNotOwnerException, ChestNotOpenedException{
-        if(chest.isOpen()) {
-            Map<String, Double> chestKeyOwners = chest.getChestKey().getListOfOwners();
-            if (chestKeyOwners.get(user)!=null) {
-                double amount = chestKeyOwners.get(user);
-                double newValue = chest.withdraw(amount);
-                chestKeyOwners.remove(user);
-                if(chestKeyOwners.isEmpty()) {
-                    //everyone got their share, delete chest
-                    chest = deleteChest(chest, me);
-                    return true;
-                }
-                else {
-                    //update collection chests
-                    //with new value stored in chest
-                    chest = updateChest(chest, me);
-                    return false;
-                }
-            }
-            else {
-                throw new UserNotOwnerException("not an owner!");
-            }
-        }
-        else {
-            throw new ChestNotOpenedException();
-        }
-    }
+    List<CKExpenceSummaryDto> getAllCKExpences() throws ResourceNotFoundException;
 
-    public boolean deposit(CKExpence me, Chest chest, String user) throws ChestOpenedException, UserNotDebtorException{
-        if(!chest.isOpen()) {
-            Map<String, Double> expenceDebtors = me.getDebtors();
-            if (expenceDebtors.get(user)!=null) {
-                double amount = expenceDebtors.get(user);
-                double newValue = chest.deposit(amount);
-                expenceDebtors.remove(user);
-                if(expenceDebtors.isEmpty()) {
-                    //everyone got their share, delete chest
-                    chest.setOpen(true);
-                    //update collection chests
-                    //with new value stored in chest
-                    chest = updateChest(chest, me);
-                    return true;
-                }
-                else {
-                    //update collection chests
-                    //with new value stored in chest
-                    chest = updateChest(chest, me);
-                    return false;
-                }
-            }
-            else {
-                throw new UserNotDebtorException("not a debtor!");
-            }
-        }
-        else {
-            throw new ChestOpenedException();
-        }
-    }
+    CKExpenceSummaryDto withdraw(String expenceId, String username) throws UserNotOwnerException, ChestNotOpenedException, ResourceNotFoundException, UserUpdateException;
 
-    public CKExpence createExpence(CKExpenceBuilder ckeb, CKExpence cke, String groupOwner)
-    {
-        cke = createChestAndKey(ckeb, cke, groupOwner);
-        mt.update(Group.class)
-                .matching(Criteria.where("groupName").is(cke.getGroupName()))
-                .apply(new Update().push("expences").value(cke)).first();
+    CKExpenceSummaryDto deposit(String expenceId, String username) throws ChestOpenedException, UserNotDebtorException, ResourceNotFoundException, UserUpdateException;
 
-        return cke;
-    }
-
-    public CKExpence createChestAndKey(CKExpenceBuilder ckeb, CKExpence ckExpence, String groupOwner) {
-
-        CKExpence ckExpence1 = ckeb.chest(ckExpence.getCost(), ckExpence.getPayingMembers(), groupOwner).build();
-        Chest chest = ckExpence1.getChest();
-        Key chestKey = chest.getChestKey();
-
-
-        kr.insert(chestKey);
-        chest.setChestKey(null);
-
-        cr.insert(chest);
-
-        mt.update(Chest.class)
-                .matching(Criteria.where("_id").is(chest.getId()))
-                .apply(new Update().set("chestKey", chestKey)).first();
-
-        ckr.insert(ckExpence1);
-
-        mt.update(CKExpence.class)
-                .matching(Criteria.where("_id").is(ckExpence1.getId()))
-                .apply(new Update().set("chest", chest)).first();
-
-        chest.setChestKey(chestKey);
-        return ckExpence1;
-    }
-
-    public Optional<CKExpence> findCKExpenceByIdExpence(String idExpence) {
-        return ckr.findCKExpenceById(idExpence);
-    }
-
-    public Chest updateChest(Chest chest, CKExpence cke) {
-        mt.save(chest.getChestKey());
-        mt.save(chest);
-        mt.save(cke);
-        return chest;
-    }
-
-    public Chest deleteChest(Chest chest, CKExpence cke) {
-
-        Chest removedChest = mt.findAndRemove(Query.query(Criteria.where("_id").is(chest.getId())),
-                Chest.class, "chests");
-
-        mt.update(CKExpence.class)
-                        .matching(Criteria.where("_id").is(cke.getId()))
-                .apply(new Update().unset("chest")).first();
-
-        //remove the key associated with the chest
-        Key keyToBeRemoved = mt.findAndRemove(Query.query(Criteria.where("_id").is(removedChest.getChestKey().getId())),
-                Key.class, "keys");
-
-        System.out.println(removedChest);
-            return removedChest;
-    }
-
+    CKExpenceSummaryDto createCKExpence(CKExpenceFormDto e) throws ResourceNotFoundException;
 
 }

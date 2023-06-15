@@ -2,13 +2,13 @@
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <![endif]-->
 <html>
 
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>My Chest&Key Expence</title>
+    <title>Group Page</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="">
@@ -23,9 +23,9 @@
             // ?product=shirt&color=blue&newuser&size=m
 
             const urlParams = new URLSearchParams(queryString);
-            const groupName = urlParams.get('searchbar')
+            const groupName = urlParams.get('search')
             console.log(groupName);
-            var url = "http://localhost:8080/groups/" + groupName;
+            var url = "http://localhost:8080/api/v1/groups/" + groupName;
 
             const result = fetch(url, {
                 method: "GET"
@@ -34,7 +34,7 @@
                 .then(group => {
                     document.getElementById("groupId").innerHTML += group.idGroup;
                     document.getElementById("groupName").innerHTML += group.groupName;
-                    document.getElementById("groupOwner").innerHTML += group.groupOwner.username;
+                    document.getElementById("groupOwner").innerHTML += group.groupOwner;
                     var tbltop = `<table>
 			    <tr><th>member</th>`;
                     //main table content we fill from data from the rest call

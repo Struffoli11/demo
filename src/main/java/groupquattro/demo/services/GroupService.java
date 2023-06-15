@@ -1,91 +1,30 @@
 package groupquattro.demo.services;
 
-import com.mongodb.client.result.UpdateResult;
-import groupquattro.demo.model.Group;
-import groupquattro.demo.model.User;
-import groupquattro.demo.repos.GroupRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.stereotype.Service;
+import groupquattro.demo.dto.CKExpenceSummaryDto;
+import groupquattro.demo.dto.GroupFormDto;
+import groupquattro.demo.dto.GroupInfoDto;
+import groupquattro.demo.dto.GroupPageDto;
+import groupquattro.demo.exceptions.DuplicateResourceException;
+import groupquattro.demo.exceptions.ResourceNotFoundException;
+import groupquattro.demo.exceptions.UserAlreadyAMemberException;
 
 import java.util.List;
-import java.util.Optional;
 
-@Service
-public class GroupService {
-    public GroupService(){}
-    @Autowired
-    MongoTemplate mt;
-    @Autowired
-    private GroupRepository gr;
+public interface GroupService {
 
-    public List<Group> allGroups(){
-        return gr.findAll();
-    }
+    public List<GroupInfoDto> getAllGroups() throws ResourceNotFoundException;
 
-    public Optional<Group> findGroupById(String idGroup){
-        return gr.findGroupByIdGroup(idGroup);
-    }
+    public GroupPageDto findGroupById(String idGroup) throws ResourceNotFoundException;
 
-    public Optional<Group> addMemberToGroup(String groupName, User user){
-        UpdateResult res = mt.update(Group.class)
-                .matching(Criteria.where("groupName").is(groupName))
-                .apply(new Update().push("members").value(user.getUsername())).first();
+    public GroupPageDto findGroupByGroupName(String groupName) throws ResourceNotFoundException;
 
-        System.out.println("found matches #" + res.getMatchedCount()+ " and modified: " + res.getModifiedCount());
+    public GroupPageDto createGroup(GroupFormDto groupFormDto) throws DuplicateResourceException;
 
-        res = mt.update(User.class)
-                .matching(Criteria.where("email").is(user.getEmail()))
-                .apply(new Update().push("groups").value(groupName)).first();
-        System.out.println("found matches #" + res.getMatchedCount()+ " and modified: " + res.getModifiedCount());
-        return findGroupByGroupName(groupName);
-    }
+    public GroupPageDto updateGroup(GroupPageDto groupPageDto) throws ResourceNotFoundException;
 
-    public Optional<Group> addMemberToGroup(String groupName, String username, String email){
-        UpdateResult res = mt.update(Group.class)
-                .matching(Criteria.where("groupName").is(groupName))
-                .apply(new Update().push("members").value(username)).first();
+    void updateGroupExpences(CKExpenceSummaryDto ckExpenceSummaryDto, String groupName) throws ResourceNotFoundException;
 
-        System.out.println("found matches #" + res.getMatchedCount()+ " and modified: " + res.getModifiedCount());
+    GroupPageDto addUser(GroupPageDto groupPageDto, String username, String groupId) throws ResourceNotFoundException, UserAlreadyAMemberException;
 
-        res = mt.update(User.class)
-                .matching(Criteria.where("email").is(email))
-                .apply(new Update().push("groups").value(groupName)).first();
-        System.out.println("found matches #" + res.getMatchedCount()+ " and modified: " + res.getModifiedCount());
-
-        return findGroupByGroupName(groupName);
-    }
-
-    public List<String> getGroupMembers(String groupName){
-        Optional<Group> aGroup = findGroupByGroupName(groupName);
-        return aGroup.orElse(null).getMembers();
-    }
-
-    public Optional<Group> findGroupByGroupName(String groupName){
-        return gr.findGroupByGroupName(groupName);
-    }
-
-    public Group createGroup(String groupName, User groupOwner, List<String> members ){
-        Group aGroup = gr.insert(new Group(groupName, groupOwner, members));
-
-        for(String username : members){
-            System.out.printf("User: "+ username);
-            mt.update(User.class)
-                    .matching(Criteria.where("username").is(username))
-                    .apply(new Update().push("groups").value(aGroup)).first();
-        }
-
-        return aGroup;
-    }
-
-    public Group createGroup(String groupName, User groupOwner){
-        Group aGroup = gr.insert(new Group(groupName, groupOwner));
-        mt.update(User.class)
-                .matching(Criteria.where("username").is(groupOwner.getUsername()))
-                .apply(new Update().push("groups").value(aGroup.getGroupName())).first();
-
-        return aGroup;
-    }
+//    List<CKExpenceSummaryDto> getExpenceWhoseDescriptioIs(String description);
 }

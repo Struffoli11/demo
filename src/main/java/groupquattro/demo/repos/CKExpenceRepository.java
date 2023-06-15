@@ -1,8 +1,6 @@
 package groupquattro.demo.repos;
 
 import groupquattro.demo.model.CKExpence;
-import groupquattro.demo.model.RomanaExpence;
-import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;

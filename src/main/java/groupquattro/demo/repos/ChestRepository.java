@@ -1,8 +1,9 @@
 package groupquattro.demo.repos;
 
 import groupquattro.demo.model.Chest;
-import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
 
-public interface ChestRepository extends MongoRepository<Chest, ObjectId> {
+@Repository
+public interface ChestRepository extends MongoRepository<Chest, String> {
 }

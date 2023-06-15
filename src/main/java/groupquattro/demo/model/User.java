@@ -1,36 +1,81 @@
 package groupquattro.demo.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.bson.types.ObjectId;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import static groupquattro.demo.model.Role.USER;
 
 @Document(collection = "users")
 @Data
+@Builder
 @AllArgsConstructor
-@NoArgsConstructor
-public class User {
+@NoArgsConstructor(force = true)
+public class User implements UserDetails {
     @Id
-    private ObjectId id;
-
+    private String id;
+    @NonNull
     private String username;
-
-    //private String password;
-
+    @NonNull
+    private String password;
     @Field(name = "emailAddress")
     private String email;
+    @DocumentReference(collection = "groups")
+    private List<Group> groups = new ArrayList<>();
 
-    private List<String> groups;
+    @DocumentReference(collection = "debts")
+    private List<Debt> debts = new ArrayList<>();
 
-    public User(String username, String email) {
+    private List<String> keys = new ArrayList<>();
+
+    private Role role=USER;
+
+
+
+    public User(String username, String password) {
         this.username = username;
-        this.email = email;
+        this.password = password;
     }
 
+    public boolean isUserAMember(String groupName){
+        for(Group g : groups){
+            if(g.getGroupName().equals(groupName)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return role.getAuthorities();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }

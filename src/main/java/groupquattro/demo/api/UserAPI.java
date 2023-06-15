@@ -1,70 +1,86 @@
 package groupquattro.demo.api;
 
-import groupquattro.demo.exceptions.UserNotFoundException;
-import groupquattro.demo.model.Group;
-import groupquattro.demo.model.User;
+import groupquattro.demo.dto.GroupPageDto;
+import groupquattro.demo.dto.RegisterRequestDto;
+import groupquattro.demo.dto.UserDto;
+import groupquattro.demo.exceptions.DuplicateResourceException;
+import groupquattro.demo.exceptions.ResourceNotFoundException;
+import groupquattro.demo.exceptions.UserAlreadyAMemberException;
+import groupquattro.demo.mapper.UserInfoMapper;
 import groupquattro.demo.services.GroupService;
 import groupquattro.demo.services.UserService;
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/v1/users/")
 public class UserAPI {
-    UserAPI(){}
     @Autowired
-    UserService us;
+    UserService userService;
 
     @Autowired
-    GroupService gs;
+    UserInfoMapper userInfoMapper;
 
-    @GetMapping("/all")
-    public ResponseEntity<List<User>> getAllUsers(){
-        return new ResponseEntity<List<User>>(us.allUsers(), HttpStatus.OK);
+    @Autowired
+    GroupService groupService;
+
+    @GetMapping
+    public ResponseEntity<?> findAll() throws ResourceNotFoundException {
+        List<UserDto> userDtoList = userService.getAllUsers();
+        return ResponseEntity.ok(userInfoMapper.toListUserInfo(userDtoList));
     }
 
-    @GetMapping("/{username}")
-    @ResponseStatus(HttpStatus.OK)
-    public Optional<User> getUser(@PathVariable String username){
-        return us.findUserByUsername(username);
+    @GetMapping(value = "/{username}")
+    public ResponseEntity<?> findByUsername(@PathVariable("username") String username) throws ResourceNotFoundException {
+        UserDto userDto = userService.findUserByUsername(username);
+        userInfoMapper.toInfo(userDto);
+        return ResponseEntity.ok(userDto);
     }
 
-    /**
-     * checks that username is not already assigned to another user
-     * @param userData a map object containing the username and password
-     * @return the User created if username is unique into the database, otherwise returns null and does not update db
-     */
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public User createUser(@RequestBody Map<String, String> userData){
-        return us.createUser(userData.get("username"), userData.get("email"));
+    public ResponseEntity<?> createUser(@RequestBody RegisterRequestDto userDto) throws DuplicateResourceException {
+        try {
+            UserDto createdUser = userService.createUser(userDto);
+
+            URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
+                    .path("/{username}")
+                    .buildAndExpand(createdUser.getUsername())
+                    .toUri();
+            return ResponseEntity.created(uri)
+                    .body(createdUser);
+        }catch(DuplicateResourceException e){
+            System.err.println(e.getLocalizedMessage());
+            return ResponseEntity.status(405).body(e.getLocalizedMessage());
+        }
     }
 
-    @PostMapping("/{username}")
-    @ResponseStatus(HttpStatus.OK)
-    public Group joinGroup(@PathVariable String username, @RequestBody Map<String, String> data){
-        Optional<User> aUser = us.findUserByUsernameAndEmail(username, data.get("email"));
-        if(aUser.isPresent()){
-            String email = aUser.get().getEmail();
-            Optional<Group> aGroup = gs.addMemberToGroup(data.get("groupName"), username, email);
-            return aGroup.orElse(null);
+    @PostMapping("/{username}/joinGroup/{groupName}")
+    public ResponseEntity<?> joinGroup(@PathVariable("username") String username,
+                                       @PathVariable("groupName") String groupName,
+                                       @RequestBody String groupId){
+        try {
+            GroupPageDto groupPage = groupService.findGroupById(groupId);
+            GroupPageDto updatedPage = groupService.addUser(groupPage, username, groupId);
+            return ResponseEntity.ok(updatedPage);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(405).body(e.getLocalizedMessage());
+        } catch (UserAlreadyAMemberException e) {
+            return ResponseEntity.status(405).body(e.getLocalizedMessage());
         }
-        throw  new UserNotFoundException("user not found");
     }
 
-    @GetMapping("/{username}/groups")
-    @ResponseStatus(HttpStatus.OK)
-    public List<String> getUserGroups(@PathVariable String username){
-        Optional<User> aUser = us.findUserByUsername(username);
-        if(aUser.isPresent()){
-            return aUser.get().getGroups();
-        }
-        return null;
-    }
+//    @GetMapping("/{username}/groups")
+//    @ResponseStatus(HttpStatus.OK)
+//    public List<Group> getUserGroups(@PathVariable String username){
+//        Optional<User> aUser = us.findUserByUsername(username);
+//        if(aUser.isPresent()){
+//            return aUser.get().getGroups();
+//        }
+//        return null;
+//    }
 }

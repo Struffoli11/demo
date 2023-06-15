@@ -4,13 +4,10 @@ import groupquattro.demo.utils.Round;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 import org.springframework.data.mongodb.core.mapping.Field;
-
-import java.nio.DoubleBuffer;
 
 @Document(collection = "chests")
 @Data
@@ -19,14 +16,10 @@ import java.nio.DoubleBuffer;
 public class Chest {
 
     @Id
-    private ObjectId id;
-
+    private String id;
     private double max_amount;
-
     private boolean open;
-
     private double currentValue;
-
     @DocumentReference
     @Field(name = "chestKey")
     private Key chestKey;
@@ -38,6 +31,10 @@ public class Chest {
         open = false;
     }
 
+    public Chest(String id) {
+        this.id = id;
+    }
+
     public double withdraw(double amount) {
         this.setCurrentValue(Round.round(this.getCurrentValue()-amount, 2));
         return this.getCurrentValue();
@@ -46,5 +43,15 @@ public class Chest {
     public double deposit(double amount) {
         this.setCurrentValue(Round.round(this.getCurrentValue()-amount, 2));
         return this.getCurrentValue();
+    }
+
+    /**
+     *
+     * @return the percentage of completion of this chest. A chest will be opened, hence
+     * complete, when the current value inside the chest will be equal to max amount
+     * that can be stored in the chest itself.
+     */
+    public double computePercentage(){
+        return Round.round(currentValue * 100 / max_amount, 2);
     }
 }
