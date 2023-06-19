@@ -27,7 +27,7 @@ public class JwtService {
       La dimensione di tale chiave dipende dai requisiti di sicurezza dell'algoritmo.
       Possiamo generare questa chiave automaticamente online attraverso vari tools.
   */
- @Value("${spring.jwt.secret}")
+  @Value("${spring.jwt.secret}")
   private String SECRET_KEY;
 
   //Il token dura 30 min

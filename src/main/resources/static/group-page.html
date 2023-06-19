@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Page </title>
+    <script src="js/group-page.js"></script>
+</head>
+
+<body onload="loadPage()">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .topnav {
+            overflow: hidden;
+            background-color: #333;
+        }
+
+        .topnav a {
+            float: left;
+            color: #f2f2f2;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+
+        .topnav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+
+        .topnav a.active {
+            background-color: #f5c723;
+            color: white;
+        }
+    </style>
+    <!-- this gives a style to the navigation bar below  -->
+
+    <div class="topnav">
+        <a href="#home" onclick="homepage()">Home</a>
+        <a href="#my profile" onclick="toProfile()">My Profile</a>
+        <a href="#logout" onclick="logout()">Logout</a>
+    </div>
+    <!-- simple navigation bar -->
+
+
+
+    <!-- scenario 1 : user is member of this group -->
+    <h1 style="text-align: center;" name="Group Name">Un Nome di un Gruppo</h1>
+
+    <div id="create_expence_div" style=text-align:left;>
+        <form>
+            <label for="description_input">Enter a meaningful description for this new expence:</label>
+            <input type="text" name="description" id="description_input"><br>
+            <br>
+            <label for="date_input">Enter the date and time</label>
+            <input type="text" name="date" id="date_input" value="dd/MM/yyyy HH:mm"><br>
+            <br>
+            <label for="cost_input">Enter the cost</label>
+            <input type="text" name="cost" id="cost_input"><br>
+
+            <!-- <table id = "payingMembers"></table><br> -->
+            <!-- to be constructed at runtime -->
+            <table id="myTable" class="table table-bordered">
+                <tr>
+                    <th>Member</th>
+                    <th>Cost</th>
+                </tr>
+            </table>
+
+            <br>
+            <input type="button" name="create_expence" id="create_expence" value="create a new expence"
+                onclick="createExpence()">
+        </form>
+    </div>
+    <!-- div for creating a new expence -->
+
+    <br>
+    <table id="members_table" class="table table-bordered">
+        <tr>
+            <th>Member</th>
+        </tr>
+    </table>
+
+
+    <br>
+    <table id="expences_table" class="table table-bordered">
+        <tr>
+            <th>Expence</th>
+            <th>Id</th>
+        </tr>
+    </table>
+
+
+    <div>
+        <input type="button" name="delete_group" id="delete_group" value="delete this group" onclick="deleteGroup()">
+        <input type="button" name="become_member" id="become_member" value="become a member!" onclick="becomeMember()">
+    </div>
+
+    <div id="secret">
+        <a id="group_code" onclick="myFunction()">Rivela codice del gruppo</a>
+    </div>
+    <!-- if clicked it will reveal the group code -->
+
+    <script>
+        function createExpence() {
+            //acquire all data from <div id = "createExpence"> 
+
+            /* acquire description */
+            const description = document.getElementById("description_input").value;
+            const cost = document.getElementById("cost_input").value;
+            const date = document.getElementById("date_input").value;
+
+
+
+            /* payingMembers map construction */
+            var payingMembersMap = new Map();
+            const myBody = document.getElementsByTagName("body")[0];
+            const myTable = document.getElementsByTagName("table");
+            const myTableBody = document.getElementsByTagName("tbody");
+
+
+            var tableLength = myTable[0].childNodes.length;
+            for (i = 2; i < tableLength; i++) {
+                const tr = myTable[0].childNodes[i];
+                const memberColumn = tr.childNodes[0];
+                const memberUsername = memberColumn.childNodes[0].value;
+                const costColumn = tr.childNodes[1];
+                const costString = costColumn.childNodes[0].value;
+                payingMembersMap.set(memberUsername, costString);
+            }
+
+
+            let
+                data = {
+                    cost: cost,
+                    description: description,
+                    date: date,
+                    payingMembers: Object.assign({}, ...Array.from(payingMembersMap.entries()).map(([k, v]) => ({ [k]: v }))),
+                    groupName: localStorage.getItem("groupName")
+                };
+
+            const myHeaders = new Headers();
+            myHeaders.append('Content-Type', 'application/json');
+            myHeaders.append("Authorization", "Bearer " + localStorage.getItem("token"));
+            /** header construction*/
+
+            var url = "http://172.31.6.4:8080/api/v1/expences";
+            fetch(url, {
+                method: "POST",
+                headers: myHeaders,
+                body: JSON.stringify(data)
+            }).then(response => {
+                if (response.status == 201) {
+                    return response.json();
+                } else if (response.status == 403) {
+                    alert("please log in again");
+                    window.location.href = "auth.html";
+                } else {
+                    alert("Try again");
+                }
+            }).then(expence => {
+                localStorage.setItem("expenceId", expence.id);
+                window.location.href = "expence-page.html";
+            });
+        }
+
+        function myFunction() {
+            var x = document.getElementById("secret");
+            if (document.getElementById("expences_table").hidden == true) {
+                return;
+            }
+            x.innerHTML = localStorage.getItem("idGroup");
+            console.log("secret id has been revealed has asked by the user");
+        }
+
+        function becomeMember() {
+            var id = prompt("Enter group code:");
+            var url = "http://172.31.6.4:8080/api/v1/groups/" + id+"/join";
+            const myHeaders = new Headers();
+            myHeaders.append('Content-Type', 'application/json');
+            myHeaders.append("Authorization", "Bearer " + localStorage.getItem("token"));
+
+            const result = fetch(url, {
+                method: "POST",
+                headers: myHeaders,
+            })
+                .then(response=> {
+                    if(response.status==200){
+                        alert(response.body);
+                        alert("please reload the page")
+                    }
+                    else{
+                        alert(response.body);
+                    }
+                    /* the application adds the user to group*/
+                    /*  once the page is reloaded the user can see details that only members know about this group*/
+                    ;
+                });
+                
+        }
+
+
+        function toProfile(){
+            window.location.href = "myprofile.html";
+        }
+
+        function logout(){
+            var url = "http://172.31.6.4:8080/api/v1/auth/Logout";
+            const myHeaders = new Headers();
+            myHeaders.append('Content-Type', 'application/json');
+            myHeaders.append("Authorization", "Bearer " + localStorage.getItem("token"));
+            const result = fetch(url, {
+                method: "POST",
+                headers: myHeaders,
+            })
+                .then(response => response.json()).then((response) => {
+                    /* the application logs out the user*/
+                    /* location.reload(); */
+                    /*  once the page is reloaded the user can see details that only members know about this group*/
+                });
+                
+        }
+
+        function reloadPage() {
+            window.location.reload();
+        }
+    </script>
+    <!--  script that reveals the group code -->
+
+
+
+
+</body>
+
+</html>

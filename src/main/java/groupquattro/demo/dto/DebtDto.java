@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 public class DebtDto {
 
     private String id;
-    private String expenceDescription;
+    private String debtor;
     private double debt;
 }

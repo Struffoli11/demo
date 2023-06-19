@@ -8,13 +8,14 @@ import groupquattro.demo.exceptions.DuplicateResourceException;
 import groupquattro.demo.exceptions.ResourceNotFoundException;
 import groupquattro.demo.exceptions.UserAlreadyAMemberException;
 import groupquattro.demo.mapper.GroupInfoMapper;
+import groupquattro.demo.mapper.GroupInfoMapperImpl;
 import groupquattro.demo.mapper.GroupPageMapper;
+import groupquattro.demo.mapper.GroupPageMapperImpl;
 import groupquattro.demo.model.CKExpence;
 import groupquattro.demo.model.Group;
 import groupquattro.demo.repos.GroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,11 +27,9 @@ public class GroupServiceImpl implements GroupService {
     @Autowired
     private GroupRepository groupRepository;
 
-    @Autowired
-    private GroupPageMapper groupMapper;
+    private GroupPageMapper groupMapper = new GroupPageMapperImpl();
 
-    @Autowired
-    private GroupInfoMapper groupInfoMapper;
+    private GroupInfoMapper groupInfoMapper = new GroupInfoMapperImpl();
 
     @Autowired
     private UserService userService;
@@ -101,13 +100,13 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public void updateGroupExpences(CKExpenceSummaryDto ckExpenceSummaryDto, String groupName) throws ResourceNotFoundException {
+    public void updateGroupExpences(CKExpence expence, String groupName) throws ResourceNotFoundException {
         Optional<Group> group = groupRepository.findGroupByGroupName(groupName);
         if(group.isPresent()){
-            GroupPageDto groupPageDto = groupMapper.toDto(group.get());
-            groupPageDto.getExpences().add(ckExpenceSummaryDto);
-            Group updatedGroup = groupMapper.toModel(groupPageDto);
+            Group updatedGroup = group.get();
+            updatedGroup.getExpences().add(expence);
             groupRepository.save(updatedGroup);
+            return;
         }else{
             throw new ResourceNotFoundException("group "+ groupName + "not found");
         }
@@ -130,7 +129,7 @@ public class GroupServiceImpl implements GroupService {
             Group updatedGroup = null;
             Group group = optionalGroup.get();
             try{
-                if(group.getMembers().add(username)==false){
+                if(group.getMembers().add(username)==false) {
                     throw new UserAlreadyAMemberException();
                 }
                 updatedGroup = groupRepository.save(group);
@@ -149,6 +148,31 @@ public class GroupServiceImpl implements GroupService {
             }
 
         }
+    }
+
+    @Override
+    public List<?> getListExpences(String groupName){
+        Group aGroup = groupRepository.findGroupByGroupName(groupName).orElseThrow();
+        return groupMapper.toDto(aGroup).getExpences();
+    }
+
+    @Override
+    public List<CKExpenceSummaryDto> getExpenceWhoseDescriptioIs(String groupName, String description) {
+        Group aGroup = groupRepository.findGroupByGroupName(groupName).orElseThrow();
+        GroupPageDto groupPageDto = groupMapper.toDto(aGroup);
+        List<CKExpenceSummaryDto> matchingExpenceSummaryDtos = new ArrayList<>();
+        for(CKExpenceSummaryDto cke : groupPageDto.getExpences()){
+            if(cke.getDescription().equals(description)){
+                matchingExpenceSummaryDtos.add(cke);
+            }
+        }
+        return matchingExpenceSummaryDtos;
+    }
+
+    @Override
+    public List<String> getGroupMembers(String groupName){
+        Group aGroup = groupRepository.findGroupByGroupName(groupName).orElseThrow();
+        return aGroup.getMembers();
     }
 
 }

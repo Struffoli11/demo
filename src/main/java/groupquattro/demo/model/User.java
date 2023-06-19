@@ -24,7 +24,6 @@ public class User implements UserDetails {
     private String id;
     @NonNull
     private String username;
-    @NonNull
     private String password;
     @Field(name = "emailAddress")
     private String email;

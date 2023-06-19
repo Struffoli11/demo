@@ -1,0 +1,33 @@
+
+<html>
+    <head>
+        <title>Sign in / Sign up</title>
+    </head>
+    <body>
+        <form>
+            <br>
+            <label>>Enter an email:</label>
+            <input type="text" name="email" id="email"><br>
+            <label>>Enter a username:</label>
+            <input type = "text" name = "username" id = "username"><br>
+            <label>>Enter a password:</label>
+            <input type = "text" name = "password" id = "password"><br>
+            <label>>Confirm the new password:</label>
+            <input type = "text" name = "confirm_password" id = "confirm_password"><br>
+            <br>
+            <input type="button" name = "submit_signup" id = "submit_signup" value = "Sign Up!" onclick="signup()"><br>
+        </form>
+
+        <form>
+            <br>
+            <label>>Enter your username:</label>
+            <input type = "text" name = "user_username" id = "user_username"><br>
+            <label>>Enter your password:</label>
+            <input type = "text" name = "user_password" id = "user_password"><br>
+            <br>
+            <input type="button" name = "submit_signin" id = "submit_signin" value = "Sign In!" onclick="signin()">
+        </form>
+        
+        <script src="js/auth.js"></script>
+    </body>
+</html>

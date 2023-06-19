@@ -7,8 +7,12 @@ import groupquattro.demo.dto.GroupPageDto;
 import groupquattro.demo.exceptions.DuplicateResourceException;
 import groupquattro.demo.exceptions.ResourceNotFoundException;
 import groupquattro.demo.exceptions.UserAlreadyAMemberException;
+import groupquattro.demo.model.CKExpence;
+import groupquattro.demo.model.Group;
+import groupquattro.demo.model.User;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface GroupService {
 
@@ -22,9 +26,13 @@ public interface GroupService {
 
     public GroupPageDto updateGroup(GroupPageDto groupPageDto) throws ResourceNotFoundException;
 
-    void updateGroupExpences(CKExpenceSummaryDto ckExpenceSummaryDto, String groupName) throws ResourceNotFoundException;
+    void updateGroupExpences(CKExpence expence, String groupName) throws ResourceNotFoundException;
 
     GroupPageDto addUser(GroupPageDto groupPageDto, String username, String groupId) throws ResourceNotFoundException, UserAlreadyAMemberException;
 
-//    List<CKExpenceSummaryDto> getExpenceWhoseDescriptioIs(String description);
+    List<?> getListExpences(String groupName);
+
+    List<CKExpenceSummaryDto> getExpenceWhoseDescriptioIs(String groupName, String description);
+
+    List<String> getGroupMembers(String groupName);
 }

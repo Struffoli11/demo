@@ -3,114 +3,289 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>homepage</title>
+    <title>Homepage</title>
+    <script src="js/homepage.js"></script>
+    <style>
+        #create_group_button {
+            position: absolute;
+            left: 700px;
+            top: 120px;
+        }
+
+        #search_group_div {
+            position: absolute;
+            left: 400px;
+            top: 70px;
+        }
+
+        #search_expence_div {
+            position: absolute;
+            left: 720px;
+            top: 70px;
+        }
+
+        #search_button {
+            position: absolute;
+            left: 600px;
+            top: 120px;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>Homepage</h1>
-    <input type="button" value="Create an Expence" onclick="createCKExpence()">
-    <br><br>
-    <div>
-        Join a Group now!
-        <form action= "group.html">
-            <input id="bar" onkeyup="loadUserGroups()" type="text"
-            name="search">
-            <input type = "submit" value = "-> GROUP PAGE">
-        </form>
-        
-        <!-- ordered list -->
-        <div id = "results"></div>
-        <br>or
-        <input type="button" name="button" id="createButton" value="Create a New Group" onclick="createGroup()">
-        <br><br><br>
-        <div id="userGroups"></div>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .topnav {
+            overflow: hidden;
+            background-color: #333;
+        }
+
+        .topnav a {
+            float: left;
+            color: #f2f2f2;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+
+        .topnav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+
+        .topnav a.active {
+            background-color: #f5c723;
+            color: white;
+        }
+    </style>
+    <!-- this gives a style to the navigation bar below  -->
+
+    <div class="topnav">
+        <a class="active" href="#home">Home</a>
+        <a href="#my profile" onclick="goToMyProfile()">My Profile</a>
+        <a href="#logout" onclick="logout()">Logout</a>
+    </div>
+    <!-- simple navigation bar -->
+
+    <div id="search_group_div">
+        <label for="group_searchbar">Search a Group</label>
+        <input type="text" value="" id="group_searchbar">
+    </div>
+    <!-- search group and/or expence  -->
+    <input type="button" id="search_button" value="Search" onclick="doSearch()">
+
+    <!-- create a new group-->
+    <input type="button" value="create a new group" id="create_group_button" onclick="createGroup()">
+
+
+    </div>
+
+
+
+    <!-- style for the slideshow -->
+    <style>
+        * {
+            box-sizing: border-box
+        }
+
+        /* Slideshow container */
+        .slideshow-container {
+            max-width: 1000px;
+            position: relative;
+            top: 200px;
+            margin: auto;
+        }
+
+        /* Hide the images by default */
+        .mySlides {
+            display: none;
+        }
+
+        /* Next & previous buttons */
+        .prev,
+        .next {
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            width: auto;
+            margin-top: -22px;
+            padding: 16px;
+            color: green;
+            font-weight: bold;
+            font-size: 18px;
+            transition: 0.6s ease;
+            border-radius: 0 3px 3px 0;
+            user-select: none;
+        }
+
+        /* Position the "next button" to the right */
+        .next {
+            right: 0;
+            border-radius: 3px 0 0 3px;
+        }
+
+        /* On hover, add a black background color with a little bit see-through */
+        .prev:hover,
+        .next:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        /* Caption text */
+        .text {
+            color: #f2f2f2;
+            font-size: 15px;
+            padding: 8px 12px;
+            position: absolute;
+            bottom: 8px;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Number text (1/3 etc) */
+        .numbertext {
+            color: #f2f2f2;
+            font-size: 12px;
+            padding: 8px 12px;
+            position: absolute;
+            top: 0;
+        }
+
+        /* The dots/bullets/indicators */
+        .dot {
+            cursor: pointer;
+            height: 15px;
+            width: 15px;
+            margin: 0 2px;
+            background-color: #bbb;
+            border-radius: 50%;
+            display: inline-block;
+            transition: background-color 0.6s ease;
+        }
+
+        .active,
+        .dot:hover {
+            background-color: #717171;
+        }
+
+        /* Fading animation */
+        .fade {
+            animation-name: fade;
+            animation-duration: 1.5s;
+        }
+
+        @keyframes fade {
+            from {
+                opacity: .4
+            }
+
+            to {
+                opacity: 1
+            }
+        }
+    </style>
+
+    <!-- Slideshow container -->
+    <div class="slideshow-container">
+
+        <!-- Full-width images with number and caption text -->
+        <div class="mySlides fade">
+            <div class="numbertext">1 / 3</div>
+            <img src="img1.png" style="width:100%">
+            <div class="text">Caption Text</div>
+        </div>
+
+        <div class="mySlides fade">
+            <div class="numbertext">2 / 3</div>
+            <img src="img2.png" style="width:100%">
+            <div class="text">Caption Two</div>
+        </div>
+
+        <div class="mySlides fade">
+            <div class="numbertext">3 / 3</div>
+            <img src="img3.png" style="width:100%">
+            <div class="text">Caption Three</div>
+        </div>
+
+        <!-- Next and previous buttons -->
+        <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+        <a class="next" onclick="plusSlides(1)">&#10095;</a>
+    </div>
+    <br>
+
+    <!-- The dots/circles -->
+    <div style="text-align:center">
+        <span class="dot" onclick="currentSlide(1)"></span>
+        <span class="dot" onclick="currentSlide(2)"></span>
+        <span class="dot" onclick="currentSlide(3)"></span>
     </div>
 
     <script>
-        var searchresult = null;
-        var timesIn = 0;
-        var inAndOut = 0
-        function loadUserGroups() {
-            var counter = 0;
-            console.log("sono qui "+ inAndOut);
-            inAndOut+=1;
-            let input = document.getElementById("bar").value;
-            document.getElementById("results").innerHTML = "";//delete previously shown groups
-            if(searchresult==null){
-                console.log("lista vuota");
-                var url = "http://localhost:8080/api/v1/groups";
-                var xmlhttp = new XMLHttpRequest();
-                const result = fetch(url, {
-                method: "GET"
-            }).then(response => response.json())
+        let slideIndex = 1;
+        showSlides(slideIndex);
 
-                .then(groupList => {
-                    searchresult = groupList;
-                    var listtop = '<ul>';
-                    //main table content we fill from data from the rest call
-                    var main = "";
-                    for (i = 0; i < searchresult.length; i++) {
-                        let upNameGroup = searchresult[i].groupName.toUpperCase();
-                        let upInput = input.toUpperCase()
-                        if(upNameGroup.includes(upInput)){
-                            timesIn += 1;
-                            let timesInPls = timesIn+1;
-                            let newId = "id"+timesInPls;
-                            console.log("first time");
-                            main += "<li id=\""+newId+"\" class=\"listItem\">";
-/*                          main += "<a href=\"group.html?searchbar="+groupList[i].groupName+"\">"; */
-                            main += searchresult[i].groupName + "</li>";
-                            counter+=1;
-                        }      
-                    }
-                    var listbottom = "</ul>";
-                    var list = listtop + main + listbottom;
-                    document.getElementById("results").innerHTML = list;
-                });
-            }
-            else{
-                console.log("lista non vuota");
-                var listtop = '<ul>';
-                    //main table content we fill from data from the rest call
-                    var main = "";
-                    for (i = 0; i < searchresult.length; i++) {
-                        let upNameGroup = searchresult[i].groupName.toUpperCase();
-                        let upInput = input.toUpperCase()
-                        if(upNameGroup.includes(upInput)){
-                        timesIn += 1;
-                            let timesInPls = timesIn+1;
-                            let newId = "id"+timesInPls;
-                            console.log("first time");
-                            main += "<li id=\""+newId+"\" class=\"listItem\">";
-/*                          main += "<a href=\"group.html?searchbar="+groupList[i].groupName+"\">"; */
-                            main += searchresult[i].groupName +"</li>";
-                            counter+=1;
-                        }
-                    }
-                    var listbottom = "</ul>";
-                    var list = listtop + main + listbottom;
-                    document.getElementById("results").innerHTML = list;
-            }
-
-            let previousTimesIn = timesIn - counter + 1;
-            for(j=0;j<counter;j++){
-                    let timesInPls = previousTimesIn+1;
-                    let newId = "id"+timesInPls;
-                    var get = document.getElementById(newId);
-                    get.addEventListener("click", clickEvent, false);
-                    previousTimesIn+=1;
-                }
+        // Next/previous controls
+        function plusSlides(n) {
+            showSlides(slideIndex += n);
         }
 
-        function clickEvent(ev){
-<!--            console.log("hey there");-->
-            console.log(ev.target.innerHTML);
-            document.getElementById("bar").value = ev.target.innerHTML;
+        // Thumbnail image controls
+        function currentSlide(n) {
+            showSlides(slideIndex = n);
+        }
+
+        function showSlides(n) {
+            let i;
+            let slides = document.getElementsByClassName("mySlides");
+            let dots = document.getElementsByClassName("dot");
+            if (n > slides.length) { slideIndex = 1 }
+            if (n < 1) { slideIndex = slides.length }
+            for (i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";
+            }
+            for (i = 0; i < dots.length; i++) {
+                dots[i].className = dots[i].className.replace(" active", "");
+            }
+            slides[slideIndex - 1].style.display = "block";
+            dots[slideIndex - 1].className += " active";
+        } 
+
+
+        function goToMyProfile(){
+            window.location.href = "myprofile.html";
+        }
+
+        function logout(){
+            var url = "http://172.31.6.4:8080/api/v1/auth/Logout";
+            const myHeaders = new Headers();
+            myHeaders.append('Content-Type', 'application/json');
+            myHeaders.append("Authorization", "Bearer " + localStorage.getItem("token"));
+            const result = fetch(url, {
+                method: "POST",
+                headers: myHeaders,
+            })
+               .then(response => {
+                if(response.status== 200){
+                    alert("Logout successful");
+                }
+                else{
+                    alert("Could not log out user");
+                }
+               });
+               localStorage.removeItem("token");
+               localStorage.removeItem("username");
+               localStorage.removeItem("expenceId");
+               localStorage.removeItem("groupName");
+               localStorage.removeItem("members");
+               window.location.href="auth.html";
+                
         }
     </script>
-
-    
 </body>
+
 </html>

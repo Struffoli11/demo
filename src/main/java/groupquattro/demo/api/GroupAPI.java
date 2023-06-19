@@ -6,10 +6,12 @@ import groupquattro.demo.dto.GroupPageDto;
 import groupquattro.demo.dto.UserDto;
 import groupquattro.demo.exceptions.DuplicateResourceException;
 import groupquattro.demo.exceptions.ResourceNotFoundException;
+import groupquattro.demo.exceptions.UserAlreadyAMemberException;
 import groupquattro.demo.exceptions.UserNotFoundException;
 import groupquattro.demo.mapper.GroupInfoMapper;
 import groupquattro.demo.services.GroupService;
 import groupquattro.demo.services.UserService;
+import jakarta.ws.rs.HEAD;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -43,11 +45,22 @@ public class GroupAPI {
 //        return ResponseEntity.ok(groupPageDto.getExpences());
 //    }
 
-//    @GetMapping("/{idGroup}")
-//    public ResponseEntity<?> findGroupById(@PathVariable String idGroup) throws ResourceNotFoundException {
-//        GroupPageDto groupInfo = groupService.findGroupById(idGroup);
-//        return ResponseEntity.ok(groupInfo);
-//    }
+    @PostMapping("/{idGroup}/join")
+    public ResponseEntity<?> addUserToGroup(@PathVariable String idGroup) throws ResourceNotFoundException, UserAlreadyAMemberException {
+        try{
+            GroupPageDto group = groupService.findGroupById(idGroup);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            GroupPageDto updatedPage = groupService.addUser(group, username, idGroup);
+            return ResponseEntity.ok().body("User " + username + "has been added to this group.");
+        }catch (ResourceNotFoundException e) {
+            System.err.println(e.getLocalizedMessage());
+            return ResponseEntity.status(405).body(e.getLocalizedMessage());
+        } catch (UserAlreadyAMemberException e) {
+            System.err.println(e.getLocalizedMessage());
+            return ResponseEntity.status(405).body(e.getLocalizedMessage());
+        }
+    }
 
     @GetMapping("/{groupName}")
     public ResponseEntity<?> findGroupByGroupName(@PathVariable String groupName) throws ResourceNotFoundException {
@@ -65,8 +78,15 @@ public class GroupAPI {
     @PostMapping
     public ResponseEntity<?> createGroup(@RequestBody GroupFormDto formDto) throws UserNotFoundException, DuplicateResourceException {
         try{
-            GroupPageDto groupPageDto = groupService.createGroup(formDto);
-            return ResponseEntity.ok(groupPageDto);
+            String groupOwner = formDto.getGroupOwner();
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            if(groupOwner.equals(username)) {
+                GroupPageDto groupPageDto = groupService.createGroup(formDto);
+                return ResponseEntity.ok(groupPageDto);
+            }else {
+                return ResponseEntity.status(401).body("You are not logged in as " + groupOwner);
+            }
         }catch (DuplicateResourceException e){
             return ResponseEntity.status(405).body(e.getMessage());
         }
@@ -74,7 +94,17 @@ public class GroupAPI {
 
     @PutMapping("/{idGroup}/")
     public ResponseEntity<?> updateGroup(@RequestBody GroupPageDto groupPageDto) throws ResourceNotFoundException {
-        GroupPageDto updatedGroup = groupService.updateGroup(groupPageDto);
-        return ResponseEntity.ok(updatedGroup);
+        String groupOwner = groupPageDto.getGroupOwner();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        if(groupOwner.equals(username)) {
+            GroupPageDto updatedGroup = groupService.updateGroup(groupPageDto);
+            return ResponseEntity.ok(updatedGroup);
+        }
+        else{
+            //only the GroupOwner can update Group Details such as GroupName or GroupOwner
+            return ResponseEntity.status(401).body("Please to update Group Info log in as Group Owner: " + groupOwner);
+        }
     }
+
 }

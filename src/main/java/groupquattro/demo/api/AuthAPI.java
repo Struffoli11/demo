@@ -8,6 +8,7 @@ import groupquattro.demo.services.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -15,10 +16,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthAPI {
 
   private final AuthenticationService service;
@@ -30,13 +35,19 @@ public class AuthAPI {
       @RequestBody RegisterRequestDto request
   ) throws DuplicateResourceException{
       try{
-          return ResponseEntity.ok(service.register(request));
+          URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
+                  .path("/{username}")
+                  .buildAndExpand(request.getUsername())
+                  .toUri();
+          //le info sull'utente potrannno essere richieste a questo url: api/v1/users/{username}
+          ResponseEntity<?> response = ResponseEntity.ok(service.register(request));
+          return response;
       }catch(DuplicateResourceException e ){
           return ResponseEntity.status(400).body(e.getLocalizedMessage());
       }
   }
   @PostMapping("/authenticate")
-  public ResponseEntity<?> authenticate( //Punto interrogativo:non si da una info precisa su cosa restituisci
+  public ResponseEntity<?> authenticate(
       @RequestBody AuthenticationRequestDto request
   ) {
     return ResponseEntity.ok(service.authenticate(request));
@@ -47,7 +58,9 @@ public class AuthAPI {
       HttpServletResponse response,
       Authentication authentication) {
 	  logoutService.logout(request, response, authentication);
+      log.info("User " + authentication.getName() + " logged out");
 	  return ResponseEntity.ok().body("");
+
   }
 
   

@@ -4,15 +4,19 @@ import groupquattro.demo.dto.CKExpenceSummaryDto;
 import groupquattro.demo.dto.DebtDto;
 import groupquattro.demo.dto.GroupPageDto;
 import groupquattro.demo.dto.UserDto;
-import groupquattro.demo.mapper.UserDtoMapper;
 import groupquattro.demo.mapper.UserDtoMapperImpl;
-import groupquattro.demo.model.Debt;
 import groupquattro.demo.model.User;
 import org.junit.Test;
 
-import java.util.ArrayList;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.*;
+import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
+@SpringBootTest(classes = {UserDtoMapperImpl.class})
 public class UserDtoUnitTest {
+
+    private final UserDtoMapperImpl userDtoMapper = new UserDtoMapperImpl();
 
     @Test
     public void whenConvertingFromUserDtoToUser_thenCorrect(){
@@ -29,6 +33,7 @@ public class UserDtoUnitTest {
         groupPageDto.getMembers().add("Anton");
         groupPageDto.setExpences(new ArrayList<CKExpenceSummaryDto>());
         userDto.getGroups().add(groupPageDto);
-        User user = new UserDtoMapperImpl().toModel(userDto);
+        User aUser = userDtoMapper.toModel(userDto);
+        assertThat(aUser.getUsername(), is(userDto.getUsername()));
     }
 }

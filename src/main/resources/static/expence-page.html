@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expence</title>
+</head>
+
+<body onload="loadPage()">
+    <script src="./js/expence-page.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .topnav {
+            overflow: hidden;
+            background-color: #333;
+        }
+
+        .topnav a {
+            float: left;
+            color: #f2f2f2;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+
+        .topnav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+
+        .topnav a.active {
+            background-color: #f5c723;
+            color: white;
+        }
+    </style>
+    <!-- this gives a style to the navigation bar below  -->
+
+    <div class="topnav">
+        <a class="active" href="#home">Home</a>
+        <a href="#my profile" onclick="goToMyProfile()">My Profile</a>
+        <a href="#logout" onclick="logout()">Logout</a>
+    </div>
+    <!-- simple navigation bar -->
+
+
+    <a class="returnbutt" href="group-page.html?groupName=" +localStorage.getItem("groupName")>
+        < back to group page</a>
+
+
+
+            <h1 id="expenceDescription_and_id">Una spesa</h1>
+
+
+            <h2 id="expence_cost">Cost</h2>
+
+
+
+            <h3 id="expence_date">Date</h3>
+
+
+            <br><br>
+            <table id="myTable">Paying Members</table>
+
+            <br>
+            <table id="debts_table" class="table table-bordered">
+                <tr>
+                    <th>Debtor</th>
+                    <th>Debt Value</th>
+                </tr>
+            </table>
+
+
+            <br>
+            <table id="owners_table" class="table table-bordered">
+                <tr>
+                    <th>Owner</th>
+                    <th>Owns Value</th>
+                </tr>
+            </table>
+
+            <br><br>
+            <div id="admin_actions ">
+                <input type="button" value="deleteExpence">
+            </div>
+
+            <br><br>
+            <div id="chestdiv">
+                <h4>Chest</h3>
+                    <img id="chestimg" src="fortnite-discover.gif" class="chest">
+
+                    <label for="file">Chest progress:</label>
+
+                    <div>
+                        <progress id="chest_status" max="100" value="70"> 70% </progress>
+                        <a id="message"> devono essere depositati ancora: </a>
+                        <br>
+                        <input type="button" id="deposit_button" value="deposit" onclick="deposit()">
+                        <input type="button" id="withdraw_button" value="withdraw" onclick="withdraw()">
+                    </div>
+
+
+            </div>
+
+            <script>
+                function logout(){
+            var url = "http://172.31.6.4:8080/api/v1/auth/Logout";
+            const myHeaders = new Headers();
+            myHeaders.append('Content-Type', 'application/json');
+            myHeaders.append("Authorization", "Bearer " + localStorage.getItem("token"));
+            const result = fetch(url, {
+                method: "POST",
+                headers: myHeaders,
+            })
+                .then(response => response.json()).then((response) => {
+                    /* the application logs out the user*/
+                    /* location.reload(); */
+                    /*  once the page is reloaded the user can see details that only members know about this group*/
+                });
+                
+        }
+            </script>
+</body>
+
+</html>

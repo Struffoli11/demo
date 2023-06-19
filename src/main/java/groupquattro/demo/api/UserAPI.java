@@ -11,6 +11,8 @@ import groupquattro.demo.services.GroupService;
 import groupquattro.demo.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -38,6 +40,11 @@ public class UserAPI {
     @GetMapping(value = "/{username}")
     public ResponseEntity<?> findByUsername(@PathVariable("username") String username) throws ResourceNotFoundException {
         UserDto userDto = userService.findUserByUsername(username);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String principal = authentication.getName();
+        if(principal.equals(username)){
+            return ResponseEntity.ok(userDto);
+        }//just user info (email and username)
         userInfoMapper.toInfo(userDto);
         return ResponseEntity.ok(userDto);
     }
@@ -59,20 +66,21 @@ public class UserAPI {
         }
     }
 
-    @PostMapping("/{username}/joinGroup/{groupName}")
-    public ResponseEntity<?> joinGroup(@PathVariable("username") String username,
-                                       @PathVariable("groupName") String groupName,
-                                       @RequestBody String groupId){
-        try {
-            GroupPageDto groupPage = groupService.findGroupById(groupId);
-            GroupPageDto updatedPage = groupService.addUser(groupPage, username, groupId);
-            return ResponseEntity.ok(updatedPage);
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(405).body(e.getLocalizedMessage());
-        } catch (UserAlreadyAMemberException e) {
-            return ResponseEntity.status(405).body(e.getLocalizedMessage());
-        }
-    }
+//    @PostMapping("joinGroup/{groupName}")
+//    public ResponseEntity<?> joinGroup(@PathVariable("groupName") String groupName,
+//                                       @RequestBody String groupId){
+//        try {
+//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//            String username = authentication.getName();
+//            GroupPageDto groupPage = groupService.findGroupById(groupId);
+//            GroupPageDto updatedPage = groupService.addUser(groupPage, username, groupId);
+//            return ResponseEntity.ok(updatedPage);
+//        } catch (ResourceNotFoundException e) {
+//            return ResponseEntity.status(405).body(e.getLocalizedMessage());
+//        } catch (UserAlreadyAMemberException e) {
+//            return ResponseEntity.status(405).body(e.getLocalizedMessage());
+//        }
+//    }
 
 //    @GetMapping("/{username}/groups")
 //    @ResponseStatus(HttpStatus.OK)

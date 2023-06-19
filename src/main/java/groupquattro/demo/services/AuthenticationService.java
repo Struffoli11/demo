@@ -5,6 +5,7 @@ import groupquattro.demo.dto.AuthenticationRequestDto;
 import groupquattro.demo.dto.AuthenticationResponseDto;
 import groupquattro.demo.dto.RegisterRequestDto;
 import groupquattro.demo.exceptions.DuplicateResourceException;
+import groupquattro.demo.model.Role;
 import groupquattro.demo.model.User;
 import groupquattro.demo.repos.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,7 @@ public class AuthenticationService {
         .email(request.getEmail())
         .username(request.getUsername())
         .password(passwordEncoder.encode(request.getPassword()))
-        .role(request.getRole())
+        .role(Role.USER)
         .build();
     
     if(repository.findUserByUsername(request.getUsername()).isPresent())
@@ -62,6 +63,7 @@ public class AuthenticationService {
     
     return AuthenticationResponseDto.builder()
         .accessToken(jwtToken)
+            .username(user.getUsername())
         .build();
   }
 
@@ -77,6 +79,7 @@ public class AuthenticationService {
     var jwtToken = jwtService.generateToken(user);
     return AuthenticationResponseDto.builder()
         .accessToken(jwtToken)
+            .username(jwtService.extractUsername(jwtToken))
         .build();
   }
   

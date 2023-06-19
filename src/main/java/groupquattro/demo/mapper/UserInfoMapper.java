@@ -2,6 +2,7 @@ package groupquattro.demo.mapper;
 
 import groupquattro.demo.dto.UserDto;
 import groupquattro.demo.dto.UserInfoDto;
+import groupquattro.demo.model.User;
 import org.mapstruct.Mapper;
 
 import java.util.List;

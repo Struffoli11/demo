@@ -9,7 +9,7 @@ import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
-@Mapper(uses = {GroupPageMapperImpl.class, DebtMapperImpl.class})
+@Mapper(componentModel = "default", uses = {GroupPageMapper.class, DebtMapper.class})
 public interface UserDtoMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -22,6 +22,7 @@ public interface UserDtoMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "password", ignore = true)
+    @Mapping(target = "role", ignore = true)
     public User updateModel(UserDto userDto, @MappingTarget User user);
 
     public List<User> convertUserDtoListToUserList(List<UserDto> users);

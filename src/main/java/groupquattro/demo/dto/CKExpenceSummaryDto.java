@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -16,5 +17,7 @@ public class CKExpenceSummaryDto {
     private String cost;
     private String date;
     private ChestDto chest;
+    private List<DebtDto> debts;
+    private Map<String, String> owners;
     private Map<String, String> payingMembers;
 }

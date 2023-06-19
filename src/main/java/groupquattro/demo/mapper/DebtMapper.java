@@ -11,9 +11,7 @@ import java.util.List;
 public interface DebtMapper {
 
 
-    @Mapping(target = "debtor", ignore = true)
     public Debt toModel(DebtDto debtDto);
-
 
     public DebtDto toDto(Debt debt);
 

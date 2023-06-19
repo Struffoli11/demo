@@ -5,11 +5,13 @@ import groupquattro.demo.dto.UserDto;
 import groupquattro.demo.exceptions.DuplicateResourceException;
 import groupquattro.demo.exceptions.ResourceNotFoundException;
 import groupquattro.demo.mapper.DebtMapperImpl;
+import groupquattro.demo.mapper.UserDtoMapper;
 import groupquattro.demo.model.Debt;
 import groupquattro.demo.repos.DebtRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,8 +24,7 @@ public class DebtServiceImpl implements DebtService{
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private DebtMapperImpl debtMapper;
+    private DebtMapperImpl debtMapper = new DebtMapperImpl();
     @Override
     public DebtDto findDebtById(String id) throws ResourceNotFoundException {
         Optional<Debt> optionalDebt = debtRepository.findDebtById(id);
@@ -78,13 +79,7 @@ public class DebtServiceImpl implements DebtService{
         String debtorUsername = "";
         for(Debt debt : savedList){
             debtorUsername = debt.getDebtor();
-            try {
-                 debtor = userService.findUserByUsername(debtorUsername);
-                 debtor.getDebts().add(debtMapper.toDto(debt));
-                 userService.updateUser(debtor);
-            } catch (ResourceNotFoundException e) {
-                throw new ResourceNotFoundException("user not found while saving debt");
-            }
+            userService.createDebt(debt, debtorUsername);
         }
         return savedList;
     }

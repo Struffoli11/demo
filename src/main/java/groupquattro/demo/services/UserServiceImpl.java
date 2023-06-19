@@ -7,10 +7,9 @@ import groupquattro.demo.dto.UserDto;
 import groupquattro.demo.exceptions.DuplicateResourceException;
 import groupquattro.demo.exceptions.ResourceNotFoundException;
 import groupquattro.demo.mapper.UserDtoMapper;
+import groupquattro.demo.mapper.UserDtoMapperImpl;
 import groupquattro.demo.mapper.UserRegistrationMapper;
-import groupquattro.demo.model.Debt;
-import groupquattro.demo.model.Group;
-import groupquattro.demo.model.User;
+import groupquattro.demo.model.*;
 import groupquattro.demo.repos.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +26,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepo;
 
-
-//    @Autowired
-//    private CustomPasswordEncoder passwordEncoder;
-
-    @Autowired
-    private UserDtoMapper userDtoMapper;
+    private UserDtoMapperImpl userDtoMapper = new UserDtoMapperImpl();
 
     @Autowired
     private UserRegistrationMapper userRegistrationMapper;
@@ -85,16 +79,15 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public UserDto updateUser(UserDto userDto) throws ResourceNotFoundException {
-        Optional<User> user = userRepo.findUserByUsername(userDto.getUsername());
+    public void updateUserKeys(String keyId, String username) throws ResourceNotFoundException {
+        Optional<User> user = userRepo.findUserByUsername(username);
         if(!user.isPresent()){
-            throw new ResourceNotFoundException("user "+ userDto.getUsername()+ " not found");
+            throw new ResourceNotFoundException("user "+ username+ " not found");
         }
         else{
-            User updatedUser = userDtoMapper.updateModel(userDto, user.get());
-            UserDto updatedUserDto = userDtoMapper.toDto(updatedUser);
-            userRepo.save(updatedUser);
-            return updatedUserDto;
+            User aUser = user.get();
+            aUser.getKeys().add(keyId);
+            return;
         }
     }
 
@@ -135,6 +128,19 @@ public class UserServiceImpl implements UserService {
         else{
             throw new ResourceNotFoundException("user " + groupMember + " not found");
         }
+    }
+
+    @Override
+    public void saveUser(User user) {
+
+    }
+
+    @Override
+    public void createDebt(Debt debt, String debtorUsername) {
+        User aUser = userRepo.findUserByUsername(debtorUsername).orElseThrow();
+        aUser.getDebts().add(debt);
+        userRepo.save(aUser);
+        return;
     }
 //
 //    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

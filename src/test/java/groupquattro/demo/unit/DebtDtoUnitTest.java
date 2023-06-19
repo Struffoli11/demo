@@ -12,10 +12,9 @@ import static org.junit.Assert.assertTrue;
 
 public class DebtDtoUnitTest {
 
-    @Autowired(required = true)
-    private DebtMapperImpl debtMapper;
     @Test
     public void whenConvertingDebtEntityToDebt_thenCorrect(){
+        DebtMapperImpl debtMapper = new DebtMapperImpl();
         Debt debt = new Debt("id", "Antonio", "idExpence", 20.00);
         DebtDto debtDto = debtMapper.toDto(debt);
         assertTrue(true);

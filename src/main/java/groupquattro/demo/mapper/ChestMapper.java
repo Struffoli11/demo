@@ -7,15 +7,15 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper
+@Mapper(componentModel = "default", uses = {BooleanYNMapper.class})
 public interface ChestMapper {
-    @Mapping(target = "id", defaultValue = "id")
-    @Mapping(target = "max_amount", ignore = true)
-    @Mapping(target = "open", ignore = true)
+
     @Mapping(target = "chestKey", ignore = true)
+    @Mapping(target = "open", source = "isOpen")
     public Chest toModel(ChestDto chestDto);
 
-    @Mapping(target = "id", defaultValue = "id")
+    @Mapping(target = "percentage", expression = "java(String.valueOf(chest.computePercentage()))")
+    @Mapping(target = "isOpen", source = "open")
     public ChestDto toDto(Chest chest);
 
     public List<ChestDto> convertChestListToDtoList(List<Chest> chestList);

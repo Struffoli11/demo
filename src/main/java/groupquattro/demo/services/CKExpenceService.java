@@ -3,8 +3,11 @@ package groupquattro.demo.services;
 import groupquattro.demo.dto.CKExpenceFormDto;
 import groupquattro.demo.dto.CKExpenceSummaryDto;
 import groupquattro.demo.exceptions.*;
+import groupquattro.demo.model.CKExpence;
+import groupquattro.demo.model.Chest;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CKExpenceService {
 

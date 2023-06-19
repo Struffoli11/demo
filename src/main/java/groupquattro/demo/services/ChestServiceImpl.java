@@ -4,6 +4,7 @@ import groupquattro.demo.dto.ChestDto;
 import groupquattro.demo.dto.UserDto;
 import groupquattro.demo.exceptions.*;
 import groupquattro.demo.mapper.ChestMapper;
+import groupquattro.demo.mapper.ChestMapperImpl;
 import groupquattro.demo.model.Chest;
 import groupquattro.demo.model.Key;
 import groupquattro.demo.repos.ChestRepository;
@@ -27,8 +28,7 @@ public class ChestServiceImpl implements ChestService {
 
     @Autowired
     private UserService userService;
-    @Autowired
-    private ChestMapper chestMapper;
+    private ChestMapper chestMapper = new ChestMapperImpl();
 
     @Autowired
     private ChestRepository chestRepository;
@@ -65,7 +65,7 @@ public class ChestServiceImpl implements ChestService {
                  userDto.setKeys(new ArrayList<String>());
              }
              userDto.getKeys().add(savedKey.getId());
-             userService.updateUser(userDto);
+             userService.updateUserKeys(savedKey.getId(), userDto.getUsername());
          }
         Chest savedChest = chestRepository.save(chest);
         return savedChest;
@@ -87,7 +87,12 @@ public class ChestServiceImpl implements ChestService {
                 Key key = chest.getChestKey();
                 double valueToWithdraw = accessOwnerList(key, chestUser);
                 chest.withdraw(valueToWithdraw);
-                chestRepository.save(chest);
+                if(keyRepository.findById(chest.getChestKey().getId()).isPresent()){
+                    chestRepository.save(chest);
+                }
+                else{
+                    chestRepository.delete(chest);
+                }
                 return true;
             }else{
                 throw new ChestNotOpenedException("chest " + chestId + " is not opened");
@@ -103,8 +108,12 @@ public class ChestServiceImpl implements ChestService {
             if(owner.equals(chestUser)){
                 double value =  key.getListOfOwners().get(owner);
                 userService.removeKey(key.getId(), chestUser);//update user keyList
-                key.getListOfOwners().remove(owner);
-                keyRepository.save(key);
+                key.getListOfOwners().remove(owner);//update the keyOwnerList
+                if(key.getListOfOwners().isEmpty()){
+                    keyRepository.delete(key);
+                }else {
+                    keyRepository.save(key);
+                }
                 return value;
             }
         }

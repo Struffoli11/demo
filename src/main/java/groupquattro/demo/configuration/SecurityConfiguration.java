@@ -35,7 +35,7 @@ public class SecurityConfiguration {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
-        .csrf()
+        .cors().and().csrf()
         .disable()
         .authorizeHttpRequests()
         // Per accedere agli URL all'interno di questo metodo l'utente deve essere autenticato.

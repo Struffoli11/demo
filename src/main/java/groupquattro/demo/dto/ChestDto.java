@@ -10,4 +10,7 @@ import lombok.NoArgsConstructor;
 public class ChestDto {
     private String id;
     private String currentValue;
+    private String percentage;
+    private String max_amount;
+    private String isOpen;
 }

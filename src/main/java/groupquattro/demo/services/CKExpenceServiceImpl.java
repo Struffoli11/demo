@@ -4,7 +4,9 @@ import groupquattro.demo.dto.CKExpenceFormDto;
 import groupquattro.demo.dto.CKExpenceSummaryDto;
 import groupquattro.demo.exceptions.*;
 import groupquattro.demo.mapper.CKExpenceFormMapper;
+import groupquattro.demo.mapper.CKExpenceFormMapperImpl;
 import groupquattro.demo.mapper.CKExpenceMapper;
+import groupquattro.demo.mapper.CKExpenceMapperImpl;
 import groupquattro.demo.model.CKExpence;
 import groupquattro.demo.model.Debt;
 import groupquattro.demo.repos.CKExpenceRepository;
@@ -27,11 +29,9 @@ public class CKExpenceServiceImpl implements CKExpenceService {
     @Autowired
     private DebtServiceImpl debtService;
 
-    @Autowired
-    private CKExpenceMapper expenceMapper;
+    private CKExpenceMapper expenceMapper = new CKExpenceMapperImpl();
 
-    @Autowired
-    private CKExpenceFormMapper formMapper;
+    private CKExpenceFormMapper formMapper = new CKExpenceFormMapperImpl();
 
 
     @Override
@@ -81,6 +81,8 @@ public class CKExpenceServiceImpl implements CKExpenceService {
             value = debt.getDebt();
             chestService.deposit(e.getChest().getId(), value); //chest update
             debtService.deleteUserDebt(debt, username);//debt and user (debtor) both get updated
+            e.getDebts().remove(debt);
+            e = expenceRepository.save(e);
             return expenceMapper.toDto(expenceRepository.findById(e.getId()).get());
         }
         else{
@@ -100,12 +102,12 @@ public class CKExpenceServiceImpl implements CKExpenceService {
         e.setDebts(debtService.createDebts(e.getDebts()));//make the debts persistent
         CKExpence savedEntity = expenceRepository.save(e);//make this expence persistent
         CKExpenceSummaryDto ckExpenceSummaryDto = expenceMapper.toDto(savedEntity);
-        addExpenceToGroup(ckExpenceSummaryDto, formDto.getGroupName()); //update group's expenceList
+        addExpenceToGroup(savedEntity, formDto.getGroupName()); //update group's expenceList
         return ckExpenceSummaryDto;
     }
 
-    private void addExpenceToGroup(CKExpenceSummaryDto ckExpenceSummaryDto, String groupName) throws ResourceNotFoundException {
-        groupService.updateGroupExpences(ckExpenceSummaryDto, groupName);
+    private void addExpenceToGroup(CKExpence ckExpence, String groupName) throws ResourceNotFoundException {
+        groupService.updateGroupExpences(ckExpence, groupName);
     }
 
 }

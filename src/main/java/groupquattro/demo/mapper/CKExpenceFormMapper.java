@@ -5,7 +5,7 @@ import groupquattro.demo.model.CKExpence;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(uses = {UtilityMapper.class})
+@Mapper(componentModel = "default", uses = {UtilityMapper.class})
 public interface CKExpenceFormMapper {
 
     @Mapping(target = "chest", ignore = true)
