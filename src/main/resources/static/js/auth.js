@@ -32,7 +32,7 @@ function signup() {
   .then(response => response.json()).then((response) =>{
     localStorage.setItem("token", response.access_token);
     localStorage.setItem("username", response.username);
-    window.location.href = "homepage.html";
+    window.location.href = "index.html";
     
   });
   //sends an HTTP POST request to invoke the method to register a new user
@@ -61,7 +61,7 @@ function signin() {
   .then(response => response.json()).then((response) =>{
     localStorage.setItem("token", response.access_token);
     localStorage.setItem("username", response.username);
-    window.location.href = "homepage.html";
+    window.location.href = "index.html";
     /* window.location.href = "homepage.html"; */
   });
 

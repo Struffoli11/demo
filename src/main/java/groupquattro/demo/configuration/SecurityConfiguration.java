@@ -40,8 +40,10 @@ public class SecurityConfiguration {
         .authorizeHttpRequests()
         // Per accedere agli URL all'interno di questo metodo l'utente deve essere autenticato.
         .requestMatchers(
+                "\"static\"immagini\"**",
+                "\"static\"html\"**",
+                "\"static\"js\"**",
                 "/api/v1/auth/**"
-                // METTERE GLI ALTRI URL!!!!!!!!!!!!
         )
           .permitAll()
           

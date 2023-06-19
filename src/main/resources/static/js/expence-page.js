@@ -1,5 +1,5 @@
 function homepage() {
-    window.location.href = "homepage.html";
+    window.location.href = "index.html";
 }
 function loadPage() {
     const id = localStorage.getItem("expenceId");
@@ -58,7 +58,7 @@ function loadPage() {
 
             if (expence.chest == null) {
                 var img = document.getElementById("chestimg");
-                img.setAttribute("src", "empty-chest.png")
+                img.setAttribute("src", "../immagini/empty-chest.png")
                 document.getElementById("message").innerHTML = "Tutti hanno pagato e prelevato";
                 document.querySelector("progress").hidden = true;
                 document.getElementById("withdraw_button").hidden = true;
