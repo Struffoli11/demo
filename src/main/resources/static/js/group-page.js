@@ -4,12 +4,7 @@ function homepage() {
 
 
 function loadPage() {
-    const queryString = window.location.search;
-    console.log(queryString);
-    // ?groupName=groupName
-
-    const urlParams = new URLSearchParams(queryString);
-    const groupName = urlParams.get('groupName')
+    var groupName = localStorage.getItem("groupName");
     var url = "http://172.31.6.4:8080/api/v1/groups/" + groupName;
     const myHeaders = new Headers();
     myHeaders.append('Content-Type', 'application/json');

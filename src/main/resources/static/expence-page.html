@@ -8,7 +8,7 @@
 </head>
 
 <body onload="loadPage()">
-    <script src="../js/expence-page.js"></script>
+    <script src="./js/expence-page.js"></script>
     <style>
         body {
             margin: 0;
@@ -42,14 +42,14 @@
     <!-- this gives a style to the navigation bar below  -->
 
     <div class="topnav">
-        <a class="active" href="#home">Home</a>
+        <a class="active" href="#home" onclick="goHome()">Home</a>
         <a href="#my profile" onclick="goToMyProfile()">My Profile</a>
         <a href="#logout" onclick="logout()">Logout</a>
     </div>
     <!-- simple navigation bar -->
 
 
-    <a class="returnbutt" href="group-page.html?groupName=" +localStorage.getItem("groupName")>
+    <a class="returnbutt" href="group-page.html">
         < back to group page</a>
 
 
@@ -92,7 +92,7 @@
             <br><br>
             <div id="chestdiv">
                 <h4>Chest</h3>
-                    <img id="chestimg" src="../immagini/fortnite-discover.gif" class="chest">
+                    <img id="chestimg" src="fortnite-discover.gif" class="chest">
 
                     <label for="file">Chest progress:</label>
 
@@ -123,6 +123,14 @@
                     /*  once the page is reloaded the user can see details that only members know about this group*/
                 });
                 
+        }
+
+        function goHome(){
+            window.location.href = "index.html";
+        }
+
+        function goProfile(){
+            window.location.href = "myprofile.html";
         }
             </script>
 </body>

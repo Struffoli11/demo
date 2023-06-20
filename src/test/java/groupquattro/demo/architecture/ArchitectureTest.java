@@ -1,2 +1,4 @@
-package groupquattro.demo.architecture;public class ArchitectureTest {
+package groupquattro.demo.architecture;
+
+public class ArchitectureTest {
 }

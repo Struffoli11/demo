@@ -8,7 +8,7 @@ import org.mapstruct.*;
 import java.util.List;
 import java.util.Map;
 
-@Mapper(componentModel = "default", uses = {DebtMapper.class, ChestMapper.class, UtilityMapper.class}, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_DEFAULT)
+@Mapper(componentModel = "default", uses = {DebtMapper.class, ChestMapper.class, UtilityMapper.class}, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface CKExpenceMapper {
 
     @Mapping(target = "owners", source = "chest", qualifiedByName = "ownersFormat")

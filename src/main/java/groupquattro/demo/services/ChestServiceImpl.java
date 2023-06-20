@@ -56,19 +56,24 @@ public class ChestServiceImpl implements ChestService {
 
     @Override
     public Chest createChest(Chest chest) throws ResourceNotFoundException {
-        Key key = chest.getChestKey();
-        Key savedKey = keyRepository.insert(key);//make the key persistent
-        chest.setChestKey(savedKey);
-         for(String owner : savedKey.getListOfOwners().keySet()) {
-             UserDto userDto = userService.findUserByUsername(owner);//the user gets the id of the key owned
-             if(userDto.getKeys().isEmpty()){
-                 userDto.setKeys(new ArrayList<String>());
-             }
-             userDto.getKeys().add(savedKey.getId());
-             userService.updateUserKeys(savedKey.getId(), userDto.getUsername());
-         }
-        Chest savedChest = chestRepository.save(chest);
-        return savedChest;
+        if(chest!=null) {
+            Key key = chest.getChestKey();
+            Key savedKey = keyRepository.insert(key);//make the key persistent
+            chest.setChestKey(savedKey);
+            for (String owner : savedKey.getListOfOwners().keySet()) {
+                UserDto userDto = userService.findUserByUsername(owner);//the user gets the id of the key owned
+                if (userDto.getKeys().isEmpty()) {
+                    userDto.setKeys(new ArrayList<String>());
+                }
+                userDto.getKeys().add(savedKey.getId());
+                userService.updateUserKeys(savedKey.getId(), userDto.getUsername());
+            }
+            Chest savedChest = chestRepository.save(chest);
+            return savedChest;
+        }
+        else{
+            return null;
+        }
     }
 
 //    public Chest updateChest(Chest chest, CKExpence cke) {

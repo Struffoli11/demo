@@ -4,10 +4,11 @@ import groupquattro.demo.dto.ChestDto;
 import groupquattro.demo.model.Chest;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import java.util.List;
 
-@Mapper(componentModel = "default", uses = {BooleanYNMapper.class})
+@Mapper(componentModel = "default", uses = {BooleanYNMapper.class}, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface ChestMapper {
 
     @Mapping(target = "chestKey", ignore = true)

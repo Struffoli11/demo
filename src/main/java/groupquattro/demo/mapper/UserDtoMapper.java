@@ -2,14 +2,11 @@ package groupquattro.demo.mapper;
 
 import groupquattro.demo.dto.UserDto;
 import groupquattro.demo.model.User;
-import org.mapstruct.InheritInverseConfiguration;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(componentModel = "default", uses = {GroupPageMapper.class, DebtMapper.class})
+@Mapper(componentModel = "default", uses = {GroupPageMapper.class, DebtMapper.class}, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface UserDtoMapper {
 
     @Mapping(target = "id", ignore = true)

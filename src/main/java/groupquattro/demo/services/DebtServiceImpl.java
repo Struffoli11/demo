@@ -74,13 +74,17 @@ public class DebtServiceImpl implements DebtService{
 
     @Override
     public List<Debt> createDebts(List<Debt> debts) throws ResourceNotFoundException {
-        List<Debt> savedList = debtRepository.saveAll(debts);
-        UserDto debtor = null;
-        String debtorUsername = "";
-        for(Debt debt : savedList){
-            debtorUsername = debt.getDebtor();
-            userService.createDebt(debt, debtorUsername);
+        if (debts != null && !debts.isEmpty()) {
+            List<Debt> savedList = debtRepository.saveAll(debts);
+            UserDto debtor = null;
+            String debtorUsername = "";
+            for (Debt debt : savedList) {
+                debtorUsername = debt.getDebtor();
+                userService.createDebt(debt, debtorUsername);
+            }
+            return savedList;
+        }else{
+            return  null;
         }
-        return savedList;
     }
 }

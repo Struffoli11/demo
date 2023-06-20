@@ -5,7 +5,8 @@ function doSearch() {
 
     if (groupName.value != "") {
         /* vai alla pagina di questo gruppo */
-        window.location.href = "group-page.html?groupName=" + groupName.value;
+        localStorage.setItem("groupName", groupName.value)
+        window.location.href = "group-page.html";
     }
     alert("Enter a Group Name");
 }
@@ -30,7 +31,8 @@ function createGroup() {
         .then(response => {
             if (response.status == 200) {
                 response = response.json();
-                window.location.href = "group-page.html?groupName=" + groupName + "&member=y";
+                localStorage.setItem("groupName", groupName);
+                window.location.href = "group-page.html";
                 /* window.location.href = "homepage.html"; */
             }else if (response.status == 401){
                 alert("please log in again");

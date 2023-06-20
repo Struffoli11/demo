@@ -60,13 +60,13 @@ public class CKExpenceBuilder implements ExpenceBuilder{
         List<Debt> debts = cKExpence.getDebts();
         for(String member : payingMembers.keySet()){
             double diff = Round.round(payingMembers.get(member)-qpc, 2);
-            if(diff<= 0){
+            if(diff< 0){
                 //this member is a debtor
                 //the debt is always negative!
                 debts.add(new Debt(diff, member, cKExpence.getDescription()));
                 amountThatOpensTheChest += -(diff);
             }
-            else{
+            else if (diff>0){
                 //this member has rights to withdraw from chest
                 //hence it's one of the owner of the key associated with the chest
                 creditors.put(member, diff);
@@ -77,7 +77,11 @@ public class CKExpenceBuilder implements ExpenceBuilder{
         //and the other has to be passed as
         // a parameter to the Key class constructor
         key = new Key(creditors);
-        chest = new Chest(Round.round(amountThatOpensTheChest, 2), key);
+        if(debts.isEmpty() || creditors.isEmpty()){
+            chest = null;
+        }else {
+            chest = new Chest(Round.round(amountThatOpensTheChest, 2), key);
+        }
         cKExpence.setChest(chest);
         return this;
     }

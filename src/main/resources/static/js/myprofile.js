@@ -82,5 +82,5 @@ function addGroupToTable(group) {
 
 function toGroup(groupName) {
     localStorage.setItem("groupName", groupName);
-    window.location.href = "group-page.html?groupName="+groupName;
+    window.location.href = "group-page.html";
 }

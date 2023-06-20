@@ -7,7 +7,7 @@ import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertThat; //not to be used anymore (?)
 
 public class ChestMapperTest {
 

@@ -52,13 +52,13 @@ function loadPage() {
             const mapOwners = new Map(Object.entries(expence.owners));
             const ownersIterator = mapOwners.keys();
             for (const owner of ownersIterator) {
-                ownersTable(owner, map.get(owner));
+                ownersTable(owner, mapOwners.get(owner));
             }
         }
 
             if (expence.chest == null) {
                 var img = document.getElementById("chestimg");
-                img.setAttribute("src", "../immagini/empty-chest.png")
+                img.setAttribute("src", "../empty-chest.png")
                 document.getElementById("message").innerHTML = "Tutti hanno pagato e prelevato";
                 document.querySelector("progress").hidden = true;
                 document.getElementById("withdraw_button").hidden = true;
