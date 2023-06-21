@@ -35,4 +35,8 @@ public interface GroupService {
     List<CKExpenceSummaryDto> getExpenceWhoseDescriptioIs(String groupName, String description);
 
     List<String> getGroupMembers(String groupName);
+
+    boolean isGroupOwner(String idGroup, String username) throws ResourceNotFoundException;
+
+    void delete(String idGroup) throws ResourceNotFoundException;
 }

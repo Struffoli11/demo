@@ -1,23 +1,27 @@
-package groupquattro.demo.unit;
+package groupquattro.demo.mapper;
 
 
-import groupquattro.demo.dto.GroupPageDto;
-import groupquattro.demo.mapper.GroupPageMapperImpl;
 import groupquattro.demo.model.CKExpence;
 import groupquattro.demo.model.Group;
-import static org.junit.Assert.assertEquals;
-import org.junit.Test;
+import groupquattro.demo.model.User;
+import groupquattro.demo.dto.GroupPageDto;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
+import static org.junit.Assert.assertEquals;
+
+@SpringBootTest(classes = {GroupPageMapperImpl.class})
 public class GroupPageDtoUnitTest {
-//
-//    @Before
-//    public void init(){
-//        User aUser = new User("Antonio", "antonio");
-//        Group aGroup = new Group("AGroup", "Antonio");
-//    }
+
+    @BeforeEach
+    public void init(){
+        User aUser = new User("Antonio", "antonio");
+        Group aGroup = new Group("AGroup", "Antonio");
+    }
 
     @Test
     public void whenConvertGroupEntityToGroupDto_thenCorrect(){

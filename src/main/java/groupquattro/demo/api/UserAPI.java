@@ -2,6 +2,7 @@ package groupquattro.demo.api;
 
 import groupquattro.demo.dto.GroupPageDto;
 import groupquattro.demo.dto.RegisterRequestDto;
+import groupquattro.demo.dto.ServerResponse;
 import groupquattro.demo.dto.UserDto;
 import groupquattro.demo.exceptions.DuplicateResourceException;
 import groupquattro.demo.exceptions.ResourceNotFoundException;
@@ -38,19 +39,23 @@ public class UserAPI {
     }
 
     @GetMapping(value = "/{username}")
-    public ResponseEntity<?> findByUsername(@PathVariable("username") String username) throws ResourceNotFoundException {
-        UserDto userDto = userService.findUserByUsername(username);
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String principal = authentication.getName();
-        if(principal.equals(username)){
+    public ResponseEntity<?> findByUsername(@PathVariable("username") String username) {
+        try {
+            UserDto userDto = userService.findUserByUsername(username);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String principal = authentication.getName();
+            if (principal.equals(username)) {
+                return ResponseEntity.ok(userDto);
+            }//just user info (email and username)
+            userInfoMapper.toInfo(userDto);
             return ResponseEntity.ok(userDto);
-        }//just user info (email and username)
-        userInfoMapper.toInfo(userDto);
-        return ResponseEntity.ok(userDto);
+        }catch (ResourceNotFoundException e){
+            return ResponseEntity.status(404).body(new ServerResponse(e.getLocalizedMessage()));
+        }
     }
 
     @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody RegisterRequestDto userDto) throws DuplicateResourceException {
+    public ResponseEntity<?> createUser(@RequestBody RegisterRequestDto userDto)  {
         try {
             UserDto createdUser = userService.createUser(userDto);
 
@@ -62,33 +67,7 @@ public class UserAPI {
                     .body(createdUser);
         }catch(DuplicateResourceException e){
             System.err.println(e.getLocalizedMessage());
-            return ResponseEntity.status(405).body(e.getLocalizedMessage());
+            return ResponseEntity.status(405).body(new ServerResponse(e.getLocalizedMessage()));
         }
     }
-
-//    @PostMapping("joinGroup/{groupName}")
-//    public ResponseEntity<?> joinGroup(@PathVariable("groupName") String groupName,
-//                                       @RequestBody String groupId){
-//        try {
-//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//            String username = authentication.getName();
-//            GroupPageDto groupPage = groupService.findGroupById(groupId);
-//            GroupPageDto updatedPage = groupService.addUser(groupPage, username, groupId);
-//            return ResponseEntity.ok(updatedPage);
-//        } catch (ResourceNotFoundException e) {
-//            return ResponseEntity.status(405).body(e.getLocalizedMessage());
-//        } catch (UserAlreadyAMemberException e) {
-//            return ResponseEntity.status(405).body(e.getLocalizedMessage());
-//        }
-//    }
-
-//    @GetMapping("/{username}/groups")
-//    @ResponseStatus(HttpStatus.OK)
-//    public List<Group> getUserGroups(@PathVariable String username){
-//        Optional<User> aUser = us.findUserByUsername(username);
-//        if(aUser.isPresent()){
-//            return aUser.get().getGroups();
-//        }
-//        return null;
-//    }
 }

@@ -175,4 +175,27 @@ public class GroupServiceImpl implements GroupService {
         return aGroup.getMembers();
     }
 
+    @Override
+    public boolean isGroupOwner(String idGroup, String username) throws ResourceNotFoundException {
+        try{
+            Group g = groupRepository.findGroupByIdGroup(idGroup).orElseThrow();
+            if(g.getGroupOwner().equals(username)){
+                return true;
+            }
+            return false;
+        }catch (Exception e) {
+            throw new ResourceNotFoundException("group not found");
+        }
+    }
+
+    @Override
+    public void delete(String idGroup) throws ResourceNotFoundException {
+        try{
+            Group g = groupRepository.findGroupByIdGroup(idGroup).orElseThrow();
+            groupRepository.deleteById(idGroup);
+        }catch (Exception e) {
+            throw new ResourceNotFoundException("group not found");
+        }
+    }
+
 }

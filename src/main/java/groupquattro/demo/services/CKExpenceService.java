@@ -22,4 +22,5 @@ public interface CKExpenceService {
 
     CKExpenceSummaryDto createCKExpence(CKExpenceFormDto e) throws ResourceNotFoundException;
 
+    void delete(String expenceId) throws ResourceNotFoundException;
 }

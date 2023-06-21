@@ -38,6 +38,13 @@
             background-color: #f5c723;
             color: white;
         }
+
+        .topnav a.identity {
+            background-color: darkgoldenrod;
+            color: #333;
+            position: absolute;
+            right: 0px;
+        }
     </style>
     <!-- this gives a style to the navigation bar below  -->
 
@@ -45,70 +52,68 @@
         <a class="active" href="#home" onclick="goHome()">Home</a>
         <a href="#my profile" onclick="goToMyProfile()">My Profile</a>
         <a href="#logout" onclick="logout()">Logout</a>
+        <a href="#group" onclick="groupPage()">Back To Group Page</a>
+        <a id="identity_username" class="identity">Logged in as: </a>
     </div>
     <!-- simple navigation bar -->
 
 
-    <a class="returnbutt" href="group-page.html">
-        < back to group page</a>
+
+    <h1 id="expenceDescription_and_id">Una spesa</h1>
+
+
+    <h2 id="expence_cost">Cost</h2>
 
 
 
-            <h1 id="expenceDescription_and_id">Una spesa</h1>
+    <h3 id="expence_date">Date</h3>
 
 
-            <h2 id="expence_cost">Cost</h2>
+    <br><br>
+    <table id="myTable">Paying Members</table>
+
+    <br>
+    <table id="debts_table" class="table table-bordered">
+        <tr>
+            <th>Debtor</th>
+            <th>Debt Value</th>
+        </tr>
+    </table>
 
 
+    <br>
+    <table id="owners_table" class="table table-bordered">
+        <tr>
+            <th>Owner</th>
+            <th>Owns Value</th>
+        </tr>
+    </table>
 
-            <h3 id="expence_date">Date</h3>
+    <br><br>
+    <div id="admin_actions ">
+        <input type="button" value="deleteExpence" onclick="deleteExpence()">
+    </div>
 
+    <br><br>
+    <div id="chestdiv">
+        <h4>Chest</h3>
+            <img id="chestimg" src="fortnite-discover.gif" class="chest">
 
-            <br><br>
-            <table id="myTable">Paying Members</table>
+            <label for="file">Chest progress:</label>
 
-            <br>
-            <table id="debts_table" class="table table-bordered">
-                <tr>
-                    <th>Debtor</th>
-                    <th>Debt Value</th>
-                </tr>
-            </table>
-
-
-            <br>
-            <table id="owners_table" class="table table-bordered">
-                <tr>
-                    <th>Owner</th>
-                    <th>Owns Value</th>
-                </tr>
-            </table>
-
-            <br><br>
-            <div id="admin_actions ">
-                <input type="button" value="deleteExpence">
+            <div>
+                <progress id="chest_status" max="100" value="70"> 70% </progress>
+                <a id="message"> devono essere depositati ancora: </a>
+                <br>
+                <input type="button" id="deposit_button" value="deposit" onclick="deposit()">
+                <input type="button" id="withdraw_button" value="withdraw" onclick="withdraw()">
             </div>
 
-            <br><br>
-            <div id="chestdiv">
-                <h4>Chest</h3>
-                    <img id="chestimg" src="fortnite-discover.gif" class="chest">
 
-                    <label for="file">Chest progress:</label>
+    </div>
 
-                    <div>
-                        <progress id="chest_status" max="100" value="70"> 70% </progress>
-                        <a id="message"> devono essere depositati ancora: </a>
-                        <br>
-                        <input type="button" id="deposit_button" value="deposit" onclick="deposit()">
-                        <input type="button" id="withdraw_button" value="withdraw" onclick="withdraw()">
-                    </div>
-
-
-            </div>
-
-            <script>
-                function logout(){
+    <script>
+        function logout() {
             var url = "http://172.31.6.4:8080/api/v1/auth/Logout";
             const myHeaders = new Headers();
             myHeaders.append('Content-Type', 'application/json');
@@ -117,22 +122,61 @@
                 method: "POST",
                 headers: myHeaders,
             })
-                .then(response => response.json()).then((response) => {
-                    /* the application logs out the user*/
-                    /* location.reload(); */
-                    /*  once the page is reloaded the user can see details that only members know about this group*/
+                .then(response => {
+                    if (response.status == 200) {
+                        localStorage.removeItem("token");
+                        localStorage.removeItem("username");
+                        localStorage.removeItem("expenceId");
+                        localStorage.removeItem("groupName");
+                        localStorage.removeItem("members");
+                        localStorage.removeItem("idGroup");
+                        window.location.href = "auth.html";
+                    }
                 });
-                
+
         }
 
-        function goHome(){
+        function goHome() {
             window.location.href = "index.html";
         }
 
-        function goProfile(){
+        function goProfile() {
             window.location.href = "myprofile.html";
         }
-            </script>
+
+        function groupPage() {
+            window.location.href = "group-page.html";
+        }
+
+        function deleteExpence(){
+            var url = "http://172.31.6.4:8080/api/v1/expences/"+localStorage.getItem("expenceId");
+            const myHeaders = new Headers();
+            myHeaders.append('Content-Type', 'application/json');
+            myHeaders.append("Authorization", "Bearer " + localStorage.getItem("token"));
+            fetch(url, {
+                method: "DELETE",
+                headers: myHeaders,
+            })
+                .then(response => {
+                    if (response.status == 204) {
+                        alert("the expence has been deleted");
+                        localStorage.removeItem("expenceId");
+                        window.location.href = "group-page.html";
+                    }else if (response.status == 404){
+                        alert("Expence not found");
+                    }else if (response.status == 403){
+                        alert("please log in again");
+                        localStorage.removeItem("token");
+                        localStorage.removeItem("username");
+                        localStorage.removeItem("expenceId");
+                        localStorage.removeItem("groupName");
+                        localStorage.removeItem("members");
+                        localStorage.removeItem("idGroup");
+/*                         window.location.href = "auth.html"; */
+                    }
+                });
+        }
+    </script>
 </body>
 
 </html>

@@ -4,6 +4,7 @@ function homepage() {
 
 
 function loadPage() {
+    document.getElementById("identity_username").innerHTML += localStorage.getItem("username");
     var groupName = localStorage.getItem("groupName");
     var url = "http://172.31.6.4:8080/api/v1/groups/" + groupName;
     const myHeaders = new Headers();
@@ -24,6 +25,7 @@ function loadPage() {
             }
             else{
                 alert("please try again, something went wrong. Try to modify the form");
+                return;
             }
         }).then(response =>{
             /* the application either returns a GroupInfoDto 
@@ -41,7 +43,6 @@ function loadPage() {
 
 
             if (response.idGroup != null) {
-                alert(true);//this user is a member of this group
                 localStorage.setItem("idGroup", response.idGroup);
                 /* so that it can be retrieved when clicked in html*/
 

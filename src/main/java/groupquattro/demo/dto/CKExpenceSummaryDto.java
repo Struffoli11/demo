@@ -20,4 +20,5 @@ public class CKExpenceSummaryDto {
     private List<DebtDto> debts;
     private Map<String, String> owners;
     private Map<String, String> payingMembers;
+    private String message;
 }

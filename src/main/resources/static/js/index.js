@@ -40,8 +40,9 @@ function createGroup() {
             }else if (response.status == 403){
                 alert("please log in again");
                 window.location.href = "auth.html";
-            }else{
-                alert("please try again");
+            }else if (response.status == 400){
+                alert("please try again, the name you chose is already in use");
+                return;
             }
         });
 }

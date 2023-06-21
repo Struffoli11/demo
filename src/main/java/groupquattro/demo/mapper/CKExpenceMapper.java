@@ -12,6 +12,7 @@ import java.util.Map;
 public interface CKExpenceMapper {
 
     @Mapping(target = "owners", source = "chest", qualifiedByName = "ownersFormat")
+    @Mapping(target = "message", ignore = true)
     public CKExpenceSummaryDto toDto(CKExpence e);
 
     @Mapping(target = "cost", source = "cost")

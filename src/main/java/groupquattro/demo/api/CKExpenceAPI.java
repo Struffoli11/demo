@@ -2,6 +2,7 @@ package groupquattro.demo.api;
 
 import groupquattro.demo.dto.CKExpenceFormDto;
 import groupquattro.demo.dto.CKExpenceSummaryDto;
+import groupquattro.demo.dto.ServerResponse;
 import groupquattro.demo.exceptions.*;
 import groupquattro.demo.services.CKExpenceService;
 import groupquattro.demo.services.GroupService;
@@ -38,41 +39,66 @@ public class CKExpenceAPI {
     }
 
     @PostMapping
-    public ResponseEntity<?> createExpence(@RequestBody CKExpenceFormDto formDto) throws ParseException, WrongExpenceTypeException, ResourceNotFoundException {
+    public ResponseEntity<?> createExpence(@RequestBody CKExpenceFormDto formDto){
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        String groupName = formDto.getGroupName();
-        CKExpenceSummaryDto receipt = null;
-        if(groupService.getGroupMembers(groupName).contains(username)) {
-             receipt = expenceService.createCKExpence(formDto);
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            String groupName = formDto.getGroupName();
+            CKExpenceSummaryDto receipt = null;
+            if (groupService.getGroupMembers(groupName).contains(username)) {
+                receipt = expenceService.createCKExpence(formDto);
 
-            URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
-                    .path("/{expenceId}")
-                    .buildAndExpand(receipt.getId())
-                    .toUri();
-            return ResponseEntity.created(uri).body(receipt);
+                URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
+                        .path("/{expenceId}")
+                        .buildAndExpand(receipt.getId())
+                        .toUri();
+                return ResponseEntity.created(uri).body(receipt);
+            } else
+                return ResponseEntity.status(401).body(new ServerResponse("User is not member of group " + groupName));
+        }catch(Exception e){
+            return ResponseEntity.status(404).body(new ServerResponse(e.getLocalizedMessage()));
         }
-        else
-            return ResponseEntity.status(401).body("User is not member of group " + groupName);
-
     }
 
     @GetMapping("/{expenceId}/withdraw/")
-    public ResponseEntity<?> withdrawFromChest(@PathVariable("expenceId") String expenceId) throws ChestNotOpenedException, UserNotOwnerException, WrongExpenceTypeException, ResourceNotFoundException, UserUpdateException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        CKExpenceSummaryDto expenceSummaryDto = expenceService.withdraw(expenceId, username);
-        return ResponseEntity.ok(expenceSummaryDto);
+    public ResponseEntity<?> withdrawFromChest(@PathVariable("expenceId") String expenceId) {
+        try{
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            CKExpenceSummaryDto expenceSummaryDto = expenceService.withdraw(expenceId, username);
+            return ResponseEntity.ok(expenceSummaryDto);
+        }catch(ResourceNotFoundException e){
+            return ResponseEntity.status(404).body(new ServerResponse(e.getLocalizedMessage()));
+        }catch(UserNotOwnerException | ChestNotOpenedException | UserUpdateException e2){
+            return ResponseEntity.status(400).body(new ServerResponse(e2.getLocalizedMessage()));
+        }
     }
 
 
     @PostMapping("/{expenceId}/payment/")
-    public ResponseEntity<?> depositChest(@PathVariable String expenceId) throws UserNotDebtorException, ChestOpenedException, WrongExpenceTypeException, ResourceNotFoundException, UserUpdateException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        CKExpenceSummaryDto expenceSummaryDto = expenceService.deposit(expenceId, username);
-        return ResponseEntity.ok(expenceSummaryDto);
+    public ResponseEntity<?> depositChest(@PathVariable String expenceId) {
+        try{
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            CKExpenceSummaryDto expenceSummaryDto = expenceService.deposit(expenceId, username);
+            return ResponseEntity.ok(expenceSummaryDto);
+        }catch(ResourceNotFoundException e){
+            return ResponseEntity.status(404).body(new ServerResponse(e.getLocalizedMessage()));
+        }catch(UserNotDebtorException | ChestOpenedException | UserUpdateException e2){
+            return ResponseEntity.status(400).body(new ServerResponse(e2.getLocalizedMessage()));
+        }
+    }
+
+    @DeleteMapping("/{expenceId}")
+    public ResponseEntity<?> deleteExpence(@PathVariable String expenceId) throws ResourceNotFoundException{
+        try{
+            expenceService.delete(expenceId);
+            return ResponseEntity.status(204).body("The expence was deleted");
+        }
+        catch (ResourceNotFoundException e){
+            return ResponseEntity.status(404).body(new ServerResponse("the expence could not be deleted"));
+        }
     }
 }
 

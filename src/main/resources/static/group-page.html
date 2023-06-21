@@ -38,6 +38,13 @@
             background-color: #f5c723;
             color: white;
         }
+
+        .topnav a.identity {
+            background-color: darkgoldenrod;
+            color: #333;
+            position: absolute;
+            right: 0px;
+        }
     </style>
     <!-- this gives a style to the navigation bar below  -->
 
@@ -45,6 +52,7 @@
         <a href="#home" onclick="homepage()">Home</a>
         <a href="#my profile" onclick="toProfile()">My Profile</a>
         <a href="#logout" onclick="logout()">Logout</a>
+        <a id="identity_username" class="identity">Logged in as: </a>
     </div>
     <!-- simple navigation bar -->
 
@@ -132,9 +140,31 @@
                 const memberUsername = memberColumn.childNodes[0].value;
                 const costColumn = tr.childNodes[1];
                 const costString = costColumn.childNodes[0].value;
-                payingMembersMap.set(memberUsername, costString);
+                if (isValidCost(costString)) {
+                    payingMembersMap.set(memberUsername, costString);
+                }
             }
 
+
+            //check expence form is correct
+
+            //description not missing
+            if (description == "" || description == null) {
+                alert("please enter valid expence description");
+                return;
+            }
+
+            //correct date format
+            if (!isValidDate(date)) {
+                alert("please enter a valid date, with the format being dd/MM/yyyy, HH:mm.");
+                return;
+            }
+
+            //check the cost is well formatted (cost is between 1€ and 9999999999€ (9miliardi))
+            if (!isValidCost(cost)) {
+                alert("please enter a valid cost");
+                return;
+            }
 
             let
                 data = {
@@ -166,7 +196,14 @@
                 }
             }).then(expence => {
                 localStorage.setItem("expenceId", expence.id);
-                window.location.href = "expence-page.html";
+                if(expence.message == null){
+                    alert("the expence was created");
+                    window.location.href = "expence-page.html";
+                }
+                else{
+                    alert("Please note that : " + expence.message + " but the expence is created anyway.");
+                    window.location.href = "expence-page.html";
+                }
             });
         }
 
@@ -181,7 +218,7 @@
 
         function becomeMember() {
             var id = prompt("Enter group code:");
-            var url = "http://172.31.6.4:8080/api/v1/groups/" + id+"/join";
+            var url = "http://172.31.6.4:8080/api/v1/groups/" + id + "/join";
             const myHeaders = new Headers();
             myHeaders.append('Content-Type', 'application/json');
             myHeaders.append("Authorization", "Bearer " + localStorage.getItem("token"));
@@ -190,27 +227,69 @@
                 method: "POST",
                 headers: myHeaders,
             })
-                .then(response=> {
-                    if(response.status==200){
+                .then(response => {
+                    if (response.status == 200) {
                         alert(response.body);
                         alert("please reload the page")
                     }
-                    else{
+                    else {
                         alert(response.body);
                     }
                     /* the application adds the user to group*/
                     /*  once the page is reloaded the user can see details that only members know about this group*/
                     ;
                 });
-                
+
         }
 
 
-        function toProfile(){
+        function toProfile() {
             window.location.href = "myprofile.html";
         }
 
-        function logout(){
+        /** function that checks that
+         * a date format is dd/MM/yyyy, HH:mm
+        */
+        function isValidDate(dateString) {
+            // First check for the pattern
+            if (!/^\d{1,2}\/\d{1,2}\/\d{4}\,\ \d{2}\:\d{2}$/.test(dateString))
+                return false;
+
+            // Parse the date parts to integers
+            var parts = dateString.split("/");
+            var day = parseInt(parts[0], 10);
+            var month = parseInt(parts[1], 10);
+            var yearAndTime = parts[2].split(",");
+            var year = parseInt(yearAndTime[0], 10);
+            var time = yearAndTime[1].trim(); // delete all whitespace before and after the time
+            var hourAndMinutes = time.split(":");
+            var hour = parseInt(hourAndMinutes[0], 10);
+            var minutes = parseInt(hourAndMinutes[1], 10);
+
+            // Check the ranges of month and year
+            if (year < 1000 || year > 3000 || month == 0 || month > 12)
+                return false;
+
+            var monthLength = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+            // Adjust for leap years
+            if (year % 400 == 0 || (year % 100 != 0 && year % 4 == 0))
+                monthLength[1] = 29;
+
+            // Check the range of the day and check the range of the hour and minutes 
+            return day > 0 && day <= monthLength[month - 1] && hour <= 23 && hour >= 0 && minutes <= 59 && minutes >= 0;
+        };
+
+        function isValidCost(costString) {
+            // First check for the pattern
+            if (!/^\d{1,10}\.\d{1,2}$/.test(costString))
+                return false;
+
+            return true;
+        };
+
+
+        function logout() {
             var url = "http://172.31.6.4:8080/api/v1/auth/Logout";
             const myHeaders = new Headers();
             myHeaders.append('Content-Type', 'application/json');
@@ -219,16 +298,48 @@
                 method: "POST",
                 headers: myHeaders,
             })
-                .then(response => response.json()).then((response) => {
-                    /* the application logs out the user*/
-                    /* location.reload(); */
-                    /*  once the page is reloaded the user can see details that only members know about this group*/
+                .then(response => {
+                    if (response.status == 200) {
+                        localStorage.removeItem("token");
+                        localStorage.removeItem("username");
+                        localStorage.removeItem("expenceId");
+                        localStorage.removeItem("groupName");
+                        localStorage.removeItem("members");
+                        localStorage.removeItem("idGroup");
+                        window.location.href = "auth.html";
+                    }
                 });
-                
+
         }
 
-        function reloadPage() {
-            window.location.reload();
+        function deleteGroup() {
+            var url = "http://172.31.6.4:8080/api/v1/groups/"+localStorage.getItem("idGroup");
+            const myHeaders = new Headers();
+            myHeaders.append('Content-Type', 'application/json');
+            myHeaders.append("Authorization", "Bearer " + localStorage.getItem("token"));
+            fetch(url, {
+                method: "DELETE",
+                headers: myHeaders,
+            })
+                .then(response => {
+                    if (response.status == 204) {
+                        alert("the group has been deleted");
+                        localStorage.removeItem("groupName");
+                        localStorage.removeItem("idGroup");
+                        window.location.href = "index.html";
+                    }else if (response.status == 404){
+                        alert("Group not found");
+                    }else if (response.status == 403){
+                        alert("pleas log in again");
+                        localStorage.removeItem("token");
+                        localStorage.removeItem("username");
+                        localStorage.removeItem("expenceId");
+                        localStorage.removeItem("groupName");
+                        localStorage.removeItem("members");
+                        localStorage.removeItem("idGroup");
+                        /* window.location.href = "auth.html"; */
+                    }
+                });
         }
     </script>
     <!--  script that reveals the group code -->

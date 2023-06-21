@@ -1,18 +1,17 @@
-package groupquattro.demo.unit;
+package groupquattro.demo.mapper;
 
+import groupquattro.demo.model.User;
 import groupquattro.demo.dto.CKExpenceSummaryDto;
 import groupquattro.demo.dto.DebtDto;
 import groupquattro.demo.dto.GroupPageDto;
 import groupquattro.demo.dto.UserDto;
-import groupquattro.demo.mapper.UserDtoMapperImpl;
-import groupquattro.demo.model.User;
-import org.junit.Test;
-
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
+
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 @SpringBootTest(classes = {UserDtoMapperImpl.class})
 public class UserDtoUnitTest {
 
@@ -34,6 +33,8 @@ public class UserDtoUnitTest {
         groupPageDto.setExpences(new ArrayList<CKExpenceSummaryDto>());
         userDto.getGroups().add(groupPageDto);
         User aUser = userDtoMapper.toModel(userDto);
-        assertThat(aUser.getUsername(), is(userDto.getUsername()));
+        assertSame(aUser.getUsername(), userDto.getUsername());
+        assertTrue(!aUser.getGroups().isEmpty());
+
     }
 }

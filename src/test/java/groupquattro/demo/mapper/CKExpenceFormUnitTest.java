@@ -1,15 +1,16 @@
-package groupquattro.demo.unit;
+package groupquattro.demo.mapper;
 
-import groupquattro.demo.dto.CKExpenceFormDto;
-import groupquattro.demo.mapper.CKExpenceFormMapper;
-import groupquattro.demo.mapper.CKExpenceFormMapperImpl;
 import groupquattro.demo.model.CKExpence;
+import groupquattro.demo.dto.CKExpenceFormDto;
 import org.junit.Test;
-import static org.junit.Assert.assertTrue;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static org.junit.Assert.assertTrue;
+
+@SpringBootTest
 public class CKExpenceFormUnitTest {
 
     @Test

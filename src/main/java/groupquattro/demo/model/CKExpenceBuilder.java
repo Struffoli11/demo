@@ -1,5 +1,6 @@
 package groupquattro.demo.model;
 
+import groupquattro.demo.exceptions.SumIsNotCorrectException;
 import groupquattro.demo.utils.Round;
 
 import java.util.*;
@@ -48,7 +49,7 @@ public class CKExpenceBuilder implements ExpenceBuilder{
         return this;
     }
 
-    public CKExpenceBuilder chest(double cost, Map<String, Double> payingMembers){
+    public CKExpenceBuilder chest(double cost, Map<String, Double> payingMembers) throws SumIsNotCorrectException {
 //        TreeMap<String, Double> orderedMembers = new TreeMap<String, Double>(payingMembers);
         String keyOwner = null;
         Key key;
@@ -56,9 +57,11 @@ public class CKExpenceBuilder implements ExpenceBuilder{
         Chest chest;
         double qpc = Round.round(cost/payingMembers.keySet().size(), 2);
         double amountThatOpensTheChest = 0.00;
+        double totalSpent = 0.00;
         cKExpence.setDebts(new ArrayList<Debt>());
         List<Debt> debts = cKExpence.getDebts();
         for(String member : payingMembers.keySet()){
+            totalSpent = Round.round(totalSpent+payingMembers.get(member), 2);
             double diff = Round.round(payingMembers.get(member)-qpc, 2);
             if(diff< 0){
                 //this member is a debtor
@@ -83,7 +86,12 @@ public class CKExpenceBuilder implements ExpenceBuilder{
             chest = new Chest(Round.round(amountThatOpensTheChest, 2), key);
         }
         cKExpence.setChest(chest);
-        return this;
+        if(totalSpent == cKExpence.getCost()) {
+            return this;
+        } else {
+            throw new SumIsNotCorrectException(String.format("total is %.2f but cost is %.2f", totalSpent, cKExpence.getCost()));
+        }
+
     }
 
 

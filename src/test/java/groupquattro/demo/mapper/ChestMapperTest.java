@@ -1,14 +1,15 @@
-package groupquattro.demo.unit;
+package groupquattro.demo.mapper;
 
-import groupquattro.demo.dto.ChestDto;
-import groupquattro.demo.mapper.ChestMapperImpl;
 import groupquattro.demo.model.Chest;
+import groupquattro.demo.dto.ChestDto;
 import org.hamcrest.MatcherAssert;
 import org.junit.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat; //not to be used anymore (?)
+import static org.junit.Assert.assertThat;
 
+@SpringBootTest(classes = {ChestMapperTest.class})
 public class ChestMapperTest {
 
     @Test

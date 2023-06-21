@@ -2,6 +2,7 @@ function homepage() {
     window.location.href = "index.html";
 }
 function loadPage() {
+    document.getElementById("identity_username").innerHTML += localStorage.getItem("username");
     const id = localStorage.getItem("expenceId");
     const descriptionHTML_Header = document.querySelector("h1");
     const costHTML_Header = document.querySelector("h2");
@@ -28,11 +29,11 @@ function loadPage() {
                 alert("please try again, modify something in the form");
             }
         }).then(expence =>{
-            
             descriptionHTML_Header.innerHTML = expence.description;
             costHTML_Header.innerHTML = expence.cost;
             dateHTML_Header.innerHTML = expence.date;
-
+            document.getElementById("deposit_button").hidden = true;
+            document.getElementById("withdraw_button").hidden = true;
 
             const map = new Map(Object.entries(expence.payingMembers));
             const iterator = map.keys();
@@ -44,6 +45,9 @@ function loadPage() {
             const debts = expence.debts;
             const debtList_length = debts.length;
             for (i=0; i<debtList_length; i++) {
+                if(debts[i].debtor == localStorage.getItem("username")){
+                    document.getElementById("deposit_button").hidden = false;
+                }
                 debtsTable(debts[i]);
             }
         }
@@ -52,6 +56,9 @@ function loadPage() {
             const mapOwners = new Map(Object.entries(expence.owners));
             const ownersIterator = mapOwners.keys();
             for (const owner of ownersIterator) {
+                if(owner == localStorage.getItem("username")){
+                    document.getElementById("withdraw_button").hidden = false;
+                }
                 ownersTable(owner, mapOwners.get(owner));
             }
         }
@@ -210,14 +217,23 @@ function deposit() {
     fetch(url, {
         method: "POST",
         headers: myHeaders
-    }).then(response => response.json())
-        .then((expence) => {
-            window.location.href = "deposit.html";
-        }).catch(error => {
-            alert("Non sei un debitore");
-            // Gestire l'errore in modo appropriato
-        });
-
+    }).then(response =>{
+        if(response.status == 200){
+            window.location.href="deposit.html";
+            return;
+        }else if (response.status == 404){
+            alert("Not found");
+            return response.json();
+        }else if(response.status == 400){
+            alert("error");
+            return response.json();
+        }else if (response.status == 403){
+            alert("please log in again");
+            return response.json();
+        }
+    }).then(response =>{
+        alert(response.info_message);
+    });
 }
 
 function withdraw() {
@@ -229,13 +245,23 @@ function withdraw() {
     fetch(url, {
         method: "GET",
         headers: myHeaders
-    }).then(response => response.json())
-        .then((expence) => {
-            window.location.href = "withdraw.html";
-        }).catch(error => {
-            alert("Non hai il permesso di accedere alla cassa");
-            // Gestire l'errore in modo appropriato
-        });
+    }).then(response =>{
+        if(response.status == 200){
+            window.location.href="withdraw.html";
+            return;
+        }else if (response.status == 404){
+            alert("Not found");
+            return response.json();
+        }else if(response.status == 400){
+            alert("error");
+            return response.json();
+        }else if (response.status == 403){
+            alert("please log in again");
+            return response.json();
+        }
+    }).then(response =>{
+        alert(response.info_message);
+    });
 
 }
 

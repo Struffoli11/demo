@@ -1,13 +1,7 @@
 package groupquattro.demo.api;
 
-import groupquattro.demo.dto.GroupFormDto;
-import groupquattro.demo.dto.GroupInfoDto;
-import groupquattro.demo.dto.GroupPageDto;
-import groupquattro.demo.dto.UserDto;
-import groupquattro.demo.exceptions.DuplicateResourceException;
-import groupquattro.demo.exceptions.ResourceNotFoundException;
-import groupquattro.demo.exceptions.UserAlreadyAMemberException;
-import groupquattro.demo.exceptions.UserNotFoundException;
+import groupquattro.demo.dto.*;
+import groupquattro.demo.exceptions.*;
 import groupquattro.demo.mapper.GroupInfoMapper;
 import groupquattro.demo.services.GroupService;
 import groupquattro.demo.services.UserService;
@@ -46,37 +40,41 @@ public class GroupAPI {
 //    }
 
     @PostMapping("/{idGroup}/join")
-    public ResponseEntity<?> addUserToGroup(@PathVariable String idGroup) throws ResourceNotFoundException, UserAlreadyAMemberException {
+    public ResponseEntity<?> addUserToGroup(@PathVariable String idGroup) {
         try{
             GroupPageDto group = groupService.findGroupById(idGroup);
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String username = authentication.getName();
             GroupPageDto updatedPage = groupService.addUser(group, username, idGroup);
-            return ResponseEntity.ok().body("User " + username + "has been added to this group.");
+            return ResponseEntity.ok().body(new ServerResponse("User " + username + "has been added to this group."));
         }catch (ResourceNotFoundException e) {
-            System.err.println(e.getLocalizedMessage());
-            return ResponseEntity.status(405).body(e.getLocalizedMessage());
+//            System.err.println(e.getLocalizedMessage());
+            return ResponseEntity.status(404).body(new ServerResponse(e.getLocalizedMessage()));
         } catch (UserAlreadyAMemberException e) {
-            System.err.println(e.getLocalizedMessage());
-            return ResponseEntity.status(405).body(e.getLocalizedMessage());
+//            System.err.println(e.getLocalizedMessage());
+            return ResponseEntity.status(400).body(new ServerResponse(e.getLocalizedMessage()));
         }
     }
 
     @GetMapping("/{groupName}")
-    public ResponseEntity<?> findGroupByGroupName(@PathVariable String groupName) throws ResourceNotFoundException {
-        GroupPageDto groupPage = groupService.findGroupByGroupName(groupName);//in this object, expences are visible
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        UserDto aUser = userService.findUserByUsername(username);
-        for(GroupPageDto groupPageDto : aUser.getGroups()){
-            if(groupPageDto.getGroupName().equals(groupName)){
-                return ResponseEntity.ok(groupPage);
+    public ResponseEntity<?> findGroupByGroupName(@PathVariable String groupName){
+        try {
+            GroupPageDto groupPage = groupService.findGroupByGroupName(groupName);//in this object, expences are visible
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            UserDto aUser = userService.findUserByUsername(username);
+            for (GroupPageDto groupPageDto : aUser.getGroups()) {
+                if (groupPageDto.getGroupName().equals(groupName)) {
+                    return ResponseEntity.ok(groupPage);
+                }
             }
+            return ResponseEntity.ok(groupInfoMapper.fromGroupPageDtoToGroupInfoDto(groupPage));
+        }catch(ResourceNotFoundException e){
+            return ResponseEntity.status(404).body(new ServerResponse(e.getLocalizedMessage()));
         }
-        return ResponseEntity.ok(groupInfoMapper.fromGroupPageDtoToGroupInfoDto(groupPage));
     }
     @PostMapping
-    public ResponseEntity<?> createGroup(@RequestBody GroupFormDto formDto) throws UserNotFoundException, DuplicateResourceException {
+    public ResponseEntity<?> createGroup(@RequestBody GroupFormDto formDto) {
         try{
             String groupOwner = formDto.getGroupOwner();
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -85,26 +83,30 @@ public class GroupAPI {
                 GroupPageDto groupPageDto = groupService.createGroup(formDto);
                 return ResponseEntity.ok(groupPageDto);
             }else {
-                return ResponseEntity.status(401).body("You are not logged in as " + groupOwner);
+                return ResponseEntity.status(401).body(new ServerResponse("You are not logged in as groupOwner"));
             }
         }catch (DuplicateResourceException e){
-            return ResponseEntity.status(405).body(e.getMessage());
+            return ResponseEntity.status(400).body(new ServerResponse(e.getMessage()));
         }
     }
 
-    @PutMapping("/{idGroup}/")
-    public ResponseEntity<?> updateGroup(@RequestBody GroupPageDto groupPageDto) throws ResourceNotFoundException {
-        String groupOwner = groupPageDto.getGroupOwner();
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        if(groupOwner.equals(username)) {
-            GroupPageDto updatedGroup = groupService.updateGroup(groupPageDto);
-            return ResponseEntity.ok(updatedGroup);
+    @DeleteMapping("/{idGroup}")
+    public ResponseEntity<?> deleteGroup(@PathVariable("idGroup") String idGroup) throws ResourceNotFoundException {
+        try{
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            if(groupService.isGroupOwner(idGroup, username)) {
+                groupService.delete(idGroup);
+                return ResponseEntity.status(204).body(new ServerResponse("The group was deleted"));
+            }else{
+                return ResponseEntity.status(401).body(new ServerResponse("You are not owner of this group"));
+            }
         }
-        else{
-            //only the GroupOwner can update Group Details such as GroupName or GroupOwner
-            return ResponseEntity.status(401).body("Please to update Group Info log in as Group Owner: " + groupOwner);
+        catch (ResourceNotFoundException e){
+            return ResponseEntity.status(404).body(new ServerResponse("The group was not found"));
         }
     }
+
+
 
 }

@@ -2,6 +2,7 @@ package groupquattro.demo.api;
 
 import groupquattro.demo.configuration.LogoutService;
 import groupquattro.demo.dto.AuthenticationRequestDto;
+import groupquattro.demo.dto.ServerResponse;
 import groupquattro.demo.dto.RegisterRequestDto;
 import groupquattro.demo.exceptions.DuplicateResourceException;
 import groupquattro.demo.services.AuthenticationService;
@@ -43,7 +44,7 @@ public class AuthAPI {
           ResponseEntity<?> response = ResponseEntity.ok(service.register(request));
           return response;
       }catch(DuplicateResourceException e ){
-          return ResponseEntity.status(400).body(e.getLocalizedMessage());
+          return ResponseEntity.status(400).body(new ServerResponse(e.getLocalizedMessage()));
       }
   }
   @PostMapping("/authenticate")
@@ -59,9 +60,6 @@ public class AuthAPI {
       Authentication authentication) {
 	  logoutService.logout(request, response, authentication);
       log.info("User " + authentication.getName() + " logged out");
-	  return ResponseEntity.ok().body("");
-
+	  return ResponseEntity.ok().body(new ServerResponse("User has been logged out successfully"));
   }
-
-  
 }
