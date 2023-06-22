@@ -85,9 +85,9 @@ function signup() {
     return;
   }
   //check that password & confirmed_Password correspond   
-  alert("An email is going to be sent to your email address. Please check your email box");
-  return;
-  /* 
+ /*  alert("An email is going to be sent to your email address. Please check your email box"); */
+  
+  
   let registrationDto = {
     username: username_input,
     password: password,
@@ -105,7 +105,7 @@ function signup() {
     localStorage.setItem("username", response.username);
     window.location.href = "index.html";
     
-  }); */
+  });
   //sends an HTTP POST request to invoke the method to register a new user
   //this checks that there is no other user with the same username and/or email
   //then save the access token used for further requests and the user's username. 
