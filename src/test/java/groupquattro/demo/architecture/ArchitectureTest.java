@@ -5,6 +5,8 @@ import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
@@ -19,6 +21,12 @@ public class ArchitectureTest {
     @ArchTest
     public static final ArchRule servicesClassesMayOnlyBeAccessedByAPIClassesOrOtherServiceClasses = classes().that().resideInAPackage("..services..").and().haveSimpleNameEndingWith("ServiceImpl").should().onlyBeAccessed().byClassesThat().resideInAnyPackage("..services..","..api..");
 
+
+    @ArchTest
+    public static final ArchRule servicesClassesShouldBeAnnotatedWithServiceAnnotation = classes().that().resideInAPackage("..services..").and().haveSimpleNameEndingWith("ServiceImpl").should().beAnnotatedWith(Service.class);
+
+    @ArchTest
+    public static final ArchRule repositoryClassesShouldBeAnnotatedWithRepositoryAnnotation = classes().that().resideInAPackage("..repos..").should().beAnnotatedWith(Repository.class);
     @ArchTest
     public static final ArchRule reposClassesMayOnlyBeAccessedByServiceClasses = classes().that().resideInAPackage("..repos..").should().onlyBeAccessed().byAnyPackage("..repos..","..configuration..", "..services..");
 

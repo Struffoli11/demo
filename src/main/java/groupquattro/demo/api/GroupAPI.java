@@ -56,6 +56,16 @@ public class GroupAPI {
         }
     }
 
+    /**
+     * Search a group by its name.
+     * If the user who asked for this group is a member, he will
+     * receive an instance of group which contains
+     * sensible intel about this group (such as expences and the group id).
+     * If the user is not a group member, an instance of  group
+     * will be returned which does not contain sensible information.
+     * @param groupName
+     * @return
+     */
     @GetMapping("/{groupName}")
     public ResponseEntity<?> findGroupByGroupName(@PathVariable String groupName){
         try {

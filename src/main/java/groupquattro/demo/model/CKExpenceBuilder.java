@@ -49,6 +49,18 @@ public class CKExpenceBuilder implements ExpenceBuilder{
         return this;
     }
 
+    /**
+     * By far the most important method. It creates a chest from a mapm of paying members
+     * and an expense cost. If the total amount paid by the members does not reach the total
+     * expense cost, the chest is created anyway. Therefore, to make the cost match
+     * the total amount of money members paid, it should be a concern of the user.
+     * If no SumIsNotCorrectException is thrown, an instance of {{@code groupquattro.demo.model.Chest}} is created, which in turn
+     * holds a chestKey object.
+     * @param cost of the expence
+     * @param payingMembers for a certain expence
+     * @return an instance of this class
+     * @throws SumIsNotCorrectException when cost is different from the total amount members did pay.
+     */
     public CKExpenceBuilder chest(double cost, Map<String, Double> payingMembers) throws SumIsNotCorrectException {
 //        TreeMap<String, Double> orderedMembers = new TreeMap<String, Double>(payingMembers);
         String keyOwner = null;

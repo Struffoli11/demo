@@ -17,6 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * A Service class for the entity chest
+ * It should not be accessed by any class that reside in a package repository
+ * and it should not access classes that reside in a package api
+ */
 @Service
 public class ChestServiceImpl implements ChestService {
 
@@ -130,9 +135,7 @@ public class ChestServiceImpl implements ChestService {
      * which is, when current value inside chest is strictly less than
      * the max amount, which is in turn the amount of money that "opens" the chest
      * @param chestId
-     * @return
      * @throws ChestOpenedException
-     * @throws UserNotDebtorException
      */
     @Override
     public void deposit(String chestId, double amount) throws ChestOpenedException, ResourceNotFoundException {
