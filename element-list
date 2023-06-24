@@ -1,0 +1,13 @@
+groupquattro.demo
+groupquattro.demo.api
+groupquattro.demo.architecture
+groupquattro.demo.configuration
+groupquattro.demo.dto
+groupquattro.demo.exceptions
+groupquattro.demo.mapper
+groupquattro.demo.model
+groupquattro.demo.repos
+groupquattro.demo.services
+groupquattro.demo.token
+groupquattro.demo.util
+groupquattro.demo.utils
